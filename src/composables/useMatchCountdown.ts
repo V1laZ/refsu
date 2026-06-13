@@ -5,6 +5,12 @@ import { dbService } from '@/services/database'
 import { globalState } from '@/stores/global'
 import type { LobbyState, BeatmapData } from '@/types'
 
+function getModSpeedMultiplier(mods: string[]): number {
+  if (mods.includes('DT') || mods.includes('NC')) return 1 / 1.5
+  if (mods.includes('HT')) return 1 / 0.75
+  return 1
+}
+
 export function useMatchCountdown(lobbyState: Readonly<Ref<LobbyState>>, roomId: Readonly<Ref<string>>) {
   const { remaining, start, stop, isActive } = useCountdown(0)
 
@@ -38,11 +44,12 @@ export function useMatchCountdown(lobbyState: Readonly<Ref<LobbyState>>, roomId:
     () => lobbyState.value.matchStatus,
     (status) => {
       if (status === 'active') {
-        const { matchStartTime, mapDrainTime } = lobbyState.value
+        const { matchStartTime, mapDrainTime, selectedMods } = lobbyState.value
         if (matchStartTime == null || mapDrainTime == null) return
 
+        const adjustedDrain = Math.round(mapDrainTime * getModSpeedMultiplier(selectedMods))
         const elapsed = Math.floor(Date.now() / 1000 - matchStartTime)
-        const remaining = Math.max(0, mapDrainTime + 5 - elapsed)
+        const remaining = Math.max(0, adjustedDrain + 5 - elapsed)
         start(remaining)
       }
       else {

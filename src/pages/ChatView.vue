@@ -37,6 +37,7 @@
 
       <QuickActionBar
         v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
+        :key="activeRoom.id"
         :room="activeRoom"
         @open-select-map="isOpenSelectMap = true"
         @send-message="sendMessage"
