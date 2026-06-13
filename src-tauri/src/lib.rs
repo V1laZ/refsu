@@ -15,7 +15,7 @@ use crate::types::IrcState;
 
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_dev_vilaz_osureffer_RustInit_initVerifier<'local>(
+pub extern "system" fn Java_dev_vilaz_refsu_RustInit_initVerifier<'local>(
     mut unowned_env: jni::EnvUnowned<'local>,
     _class: jni::objects::JClass<'local>,
     context: jni::objects::JObject<'local>,
@@ -52,7 +52,7 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
-                .add_migrations("sqlite:osu_reffer_database.db", migrations)
+                .add_migrations("sqlite:refsu_database.db", migrations)
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
@@ -134,7 +134,7 @@ pub fn run() {
 
             #[cfg(desktop)]
             {
-                if let Err(err) = app.deep_link().register("osureffer") {
+                if let Err(err) = app.deep_link().register("refsu") {
                     eprintln!("Failed to register deep link: {}", err);
                 }
             }

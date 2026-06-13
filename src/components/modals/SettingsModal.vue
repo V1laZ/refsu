@@ -65,7 +65,7 @@
     </div>
 
     <template #footer>
-      <span class="text-xs text-slate-500">osu!Reffer v{{ appVersion }}</span>
+      <span class="text-xs text-slate-500">Refsu v{{ appVersion }}</span>
     </template>
   </Modal>
 </template>

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "osu!Reffer",
+  "productName": "Refsu",
   "version": "0.9.0",
-  "identifier": "dev.vilaz.osureffer",
+  "identifier": "dev.vilaz.refsu",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "osu!Reffer",
+        "title": "Refsu",
         "width": 1200,
         "height": 800,
         "dragDropEnabled": false,
@@ -27,18 +27,18 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNBQUYxMzRBOUFBQzI2OEMKUldTTUpxeWFTaE92T3N3OTFwRFcwWXV1L1A3d1JhZ0Q5VkEvRjYzRTJkTVZtSkJVWURPbUNJakoK",
       "endpoints": [
-        "https://osureffer.vilaz.dev/updates"
+        "https://refsu.vilaz.dev/updates"
       ]
     },
     "sql": {
       "preload": [
-        "sqlite:osu_reffer_database.db"
+        "sqlite:refsu_database.db"
       ]
     },
     "deep-link": {
       "mobile": [
         {
-          "host": "osureffer.vilaz.dev",
+          "host": "refsu.vilaz.dev",
           "pathPrefix": [
             "/app-link"
           ]
@@ -46,7 +46,7 @@
       ],
       "desktop": {
         "schemes": [
-          "osureffer"
+          "refsu"
         ]
       }
     }

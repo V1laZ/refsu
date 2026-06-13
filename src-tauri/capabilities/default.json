@@ -21,7 +21,7 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "https://osureffer.vilaz.dev"
+          "url": "https://refsu.vilaz.dev"
         }
       ]
     },

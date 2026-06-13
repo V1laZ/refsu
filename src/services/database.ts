@@ -7,7 +7,7 @@ class DatabaseService {
 
   async init(): Promise<void> {
     try {
-      this.db = await Database.load('sqlite:osu_reffer_database.db')
+      this.db = await Database.load('sqlite:refsu_database.db')
 
       console.log('Database initialized successfully')
     }
@@ -210,7 +210,7 @@ class DatabaseService {
 
   private async refreshToken(username: string, oldRefreshToken: string): Promise<string | null> {
     const res = await fetch(
-      `https://osureffer.vilaz.dev/refresh-token?refresh_token=${oldRefreshToken}`,
+      `https://refsu.vilaz.dev/refresh-token?refresh_token=${oldRefreshToken}`,
       { method: 'POST' },
     )
 

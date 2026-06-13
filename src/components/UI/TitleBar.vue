@@ -4,7 +4,7 @@
       data-tauri-drag-region
       class="flex h-full flex-1 items-center gap-2 px-3"
     >
-      <span class="text-xs font-medium text-slate-400">osu!Reffer</span>
+      <span class="text-xs font-medium text-slate-400">Refsu</span>
     </div>
 
     <div class="flex h-full">

@@ -24,7 +24,7 @@ import { modalsState } from '@/stores/global'
 import Btn from '@/components/UI/Btn.vue'
 
 function handleConnect() {
-  openUrl('https://osureffer.vilaz.dev/login')
+  openUrl('https://refsu.vilaz.dev/login')
   modalsState.showOAuthCallback = true
 }
 </script>

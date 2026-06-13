@@ -13,7 +13,7 @@
         <div class="flex max-w-sm flex-col items-center text-center">
           <Spinner class="mb-5 size-10 text-pink-300" />
           <h2 class="mb-1 text-xl font-semibold text-slate-100">
-            osu!Reffer
+            Refsu
           </h2>
           <p class="text-sm text-slate-400">
             {{ loadingMessage }}

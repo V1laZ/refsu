@@ -1,7 +1,7 @@
 import { fetch } from '@tauri-apps/plugin-http'
 import type { ExtractedRound, ExtractedSheet } from '@/types'
 
-const EXTRACT_URL = 'https://osureffer.vilaz.dev/extract-mappool'
+const EXTRACT_URL = 'https://refsu.vilaz.dev/extract-mappool'
 
 export async function extractMappoolFromSheet(url: string): Promise<ExtractedSheet> {
   const res = await fetch(EXTRACT_URL, {

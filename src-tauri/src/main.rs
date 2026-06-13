@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    easyosureffer_lib::run()
+    refsu_lib::run()
 }

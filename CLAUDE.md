@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-osu!Reffer is a cross-platform (desktop + Android) IRC client for osu! tournament referees, built with Tauri 2 (Rust backend) + Vue 3 / TypeScript / Tailwind v4 frontend. It connects to osu!'s IRC server (`irc.ppy.sh:6667`) and overlays referee-specific UI (mappools, lobby state tracking, quick `!mp` commands) on top of plain IRC.
+Refsu is a cross-platform (desktop + Android) IRC client for osu! tournament referees, built with Tauri 2 (Rust backend) + Vue 3 / TypeScript / Tailwind v4 frontend. It connects to osu!'s IRC server (`irc.ppy.sh:6667`) and overlays referee-specific UI (mappools, lobby state tracking, quick `!mp` commands) on top of plain IRC.
 
 ## Commands
 
@@ -56,11 +56,11 @@ Rooms are keyed by their IRC id (`#channel`, `#mp_12345`, or a PM username). `Ro
 
 ### Persistence
 
-SQLite via `tauri-plugin-sql`, file `osu_reffer_database.db`. Tables: `user_credentials` (IRC login), `mappools` + `beatmap_entries` (tournament mappools), `oauth_tokens` (osu! API OAuth, keyed by `irc_username`). All DB calls go through `src/services/database.ts` (singleton `dbService`). Token refresh hits `https://osureffer.vilaz.dev/refresh-token` and clears the row on failure.
+SQLite via `tauri-plugin-sql`, file `refsu_database.db`. Tables: `user_credentials` (IRC login), `mappools` + `beatmap_entries` (tournament mappools), `oauth_tokens` (osu! API OAuth, keyed by `irc_username`). All DB calls go through `src/services/database.ts` (singleton `dbService`). Token refresh hits `https://refsu.vilaz.dev/refresh-token` and clears the row on failure.
 
 ### OAuth
 
-osu! OAuth uses a deep link (`osureffer://` on desktop, `osureffer.vilaz.dev/callback` on Android). The handler in `lib.rs` (`app.deep_link().on_open_url`) base64-decodes the `data` query param into `{access_token, refresh_token, expires_in}` and emits `oauth-token-callback` to the frontend, which writes it to `oauth_tokens` via `dbService.saveOAuthToken`.
+osu! OAuth uses a deep link (`refsu://` on desktop, `refsu.vilaz.dev/callback` on Android). The handler in `lib.rs` (`app.deep_link().on_open_url`) base64-decodes the `data` query param into `{access_token, refresh_token, expires_in}` and emits `oauth-token-callback` to the frontend, which writes it to `oauth_tokens` via `dbService.saveOAuthToken`.
 
 ## Conventions
 
