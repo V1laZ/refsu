@@ -1,7 +1,8 @@
 <template>
-  <aside
-    class="fixed bottom-safe left-safe top-safe z-40 flex w-80 max-w-full transform flex-col border-r border-slate-800 bg-slate-900 transition-transform duration-300 ease-in-out lg:relative lg:top-auto lg:translate-x-0"
-    :class="isOpen ? 'translate-x-0' : '-translate-x-full'"
+  <Drawer
+    side="left"
+    :open="open"
+    @update:open="emit('update:open', $event)"
   >
     <header class="flex items-center justify-between border-b border-slate-800 px-4 py-3">
       <h2 class="text-base font-semibold text-slate-100">
@@ -11,7 +12,7 @@
         icon="close"
         size="sm"
         class="lg:hidden"
-        @click="emit('close')"
+        @click="emit('update:open', false)"
       />
     </header>
 
@@ -93,12 +94,13 @@
         />
       </div>
     </footer>
-  </aside>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import RoomItem from './RoomItem.vue'
+import Drawer from '@/components/UI/Drawer.vue'
 import Btn from '@/components/UI/Btn.vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
 import Icon from '@/components/UI/Icon.vue'
@@ -107,18 +109,18 @@ import { confirm } from '@/composables/useConfirm'
 import type { RoomListItem } from '@/types'
 
 const props = defineProps<{
-  isOpen: boolean
+  open: boolean
   rooms: RoomListItem[]
   activeRoomId?: string
 }>()
 
 const emit = defineEmits<{
-  close: []
-  selectRoom: [roomId: string]
-  joinChannel: [channel: string]
-  leaveRoom: [roomId: string]
-  startPrivateMessage: [username: string]
-  openCreateLobby: []
+  'update:open': [value: boolean]
+  'selectRoom': [roomId: string]
+  'joinChannel': [channel: string]
+  'leaveRoom': [roomId: string]
+  'startPrivateMessage': [username: string]
+  'openCreateLobby': []
 }>()
 
 const newRoomName = ref('')

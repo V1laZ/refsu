@@ -1,7 +1,8 @@
 <template>
-  <aside
-    class="fixed bottom-safe right-safe top-safe z-40 flex w-80 max-w-full transform flex-col border-l border-slate-800 bg-slate-900 transition-transform duration-300 ease-in-out lg:relative lg:top-auto lg:translate-x-0"
-    :class="isOpen ? 'translate-x-0' : 'translate-x-full'"
+  <Drawer
+    side="right"
+    :open="open"
+    @update:open="emit('update:open', $event)"
   >
     <header class="flex items-start justify-between gap-2 border-b border-slate-800 px-4 py-3">
       <div>
@@ -24,7 +25,7 @@
           icon="close"
           size="sm"
           class="lg:hidden"
-          @click="emit('close')"
+          @click="emit('update:open', false)"
         />
       </div>
     </header>
@@ -41,26 +42,27 @@
         />
       </div>
     </div>
-  </aside>
+  </Drawer>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import PlayerSlot from './PlayerSlot.vue'
+import Drawer from '@/components/UI/Drawer.vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
 import type { LobbyState, PlayerMoveEvent, PlayerTeamChangeEvent } from '@/types'
 
 const props = defineProps<{
-  isOpen: boolean
+  open: boolean
   lobbyState: LobbyState
 }>()
 
 const emit = defineEmits<{
-  close: []
-  move: [move: PlayerMoveEvent]
-  teamChange: [event: PlayerTeamChangeEvent]
-  host: [host: string | null]
-  openInvitePlayer: []
+  'update:open': [value: boolean]
+  'move': [move: PlayerMoveEvent]
+  'teamChange': [event: PlayerTeamChangeEvent]
+  'host': [host: string | null]
+  'openInvitePlayer': []
 }>()
 
 const occupiedSlots = computed(() =>

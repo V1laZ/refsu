@@ -2,10 +2,9 @@
   <div class="flex grow overflow-hidden bg-slate-950 text-slate-100">
     <!-- Left Drawer - Channels -->
     <RoomsDrawer
-      :is-open="leftDrawerOpen"
+      v-model:open="leftDrawerOpen"
       :rooms="roomsList"
       :active-room-id="activeRoom?.id"
-      @close="leftDrawerOpen = false"
       @select-room="handleSelectRoom"
       @join-channel="joinChannel"
       @leave-room="leaveRoom"
@@ -74,7 +73,7 @@
 
     <PlayersDrawer
       v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
-      :is-open="rightDrawerOpen"
+      v-model:open="rightDrawerOpen"
       :lobby-state="activeRoom.lobbyState"
       @move="sendMessage(`!mp move ${$event.playerName} ${$event.to}`)"
       @team-change="sendMessage(`!mp team ${$event.playerName} ${$event.team}`)"
@@ -85,7 +84,6 @@
           sendMessage(`!mp host ${$event}`)
         }
       }"
-      @close="rightDrawerOpen = false"
       @open-invite-player="invitePlayerOpen = true"
     />
 
@@ -109,15 +107,6 @@
       v-if="playerModalOpen && selectedPlayerUsername"
       v-model="playerModalOpen"
       :username="selectedPlayerUsername"
-    />
-
-    <!-- Mobile Overlay -->
-    <div
-      class="fixed inset-safe z-30 transition-colors lg:hidden"
-      :class="leftDrawerOpen || rightDrawerOpen
-        ? 'bg-slate-950/70 backdrop-blur-sm'
-        : 'pointer-events-none'"
-      @click="closeDrawers"
     />
   </div>
 </template>
@@ -318,11 +307,6 @@ const sendMessage = async (messageText: string) => {
   catch (error) {
     console.error('Failed to send message:', error)
   }
-}
-
-const closeDrawers = () => {
-  leftDrawerOpen.value = false
-  rightDrawerOpen.value = false
 }
 
 const handleLogout = async () => {
