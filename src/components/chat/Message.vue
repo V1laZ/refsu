@@ -28,10 +28,23 @@
           </span>
         </div>
 
-        <p
-          class="mt-0.5 break-words text-sm text-slate-200"
-          v-html="formattedMessage"
-        />
+        <p class="mt-0.5 wrap-break-word text-sm text-slate-200">
+          <template
+            v-for="(segment, index) in messageSegments"
+            :key="index"
+          >
+            <a
+              v-if="segment.type === 'link'"
+              :href="segment.value"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-pink-300 hover:text-pink-200 hover:underline"
+            >{{ segment.value }}</a>
+            <template v-else>
+              {{ segment.value }}
+            </template>
+          </template>
+        </p>
       </div>
     </div>
   </div>
@@ -59,11 +72,26 @@ const formattedTime = computed(() => {
   })
 })
 
-const formattedMessage = computed(() => {
-  return props.message.message.replace(
-    /(https?:\/\/[^\s]+)/g,
-    '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-pink-300 hover:text-pink-200 hover:underline">$1</a>',
-  )
+type MessageSegment = { type: 'text' | 'link', value: string }
+
+const messageSegments = computed<MessageSegment[]>(() => {
+  const text = props.message.message
+  const segments: MessageSegment[] = []
+  const urlRegex = /(https?:\/\/[^\s]+)/g
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = urlRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ type: 'text', value: text.slice(lastIndex, match.index) })
+    }
+    segments.push({ type: 'link', value: match[0] })
+    lastIndex = match.index + match[0].length
+  }
+  if (lastIndex < text.length) {
+    segments.push({ type: 'text', value: text.slice(lastIndex) })
+  }
+  return segments
 })
 
 const handleUsernameClick = () => {
