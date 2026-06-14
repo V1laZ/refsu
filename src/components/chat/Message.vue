@@ -55,26 +55,54 @@
           </span>
         </button>
 
-        <p
-          v-else
-          class="mt-0.5 wrap-break-word text-sm text-slate-200"
-        >
+        <template v-else>
+          <p
+            v-if="textSegments.length"
+            class="mt-0.5 wrap-break-word text-sm text-slate-200"
+          >
+            <template
+              v-for="(segment, index) in textSegments"
+              :key="index"
+            >
+              <a
+                v-if="segment.type === 'link'"
+                :href="segment.value"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-pink-300 hover:text-pink-200 hover:underline"
+              >{{ segment.value }}</a>
+              <template v-else>
+                {{ segment.value }}
+              </template>
+            </template>
+          </p>
+
           <template
-            v-for="(segment, index) in messageSegments"
-            :key="index"
+            v-for="url in screenshotSegments"
+            :key="url"
           >
             <a
-              v-if="segment.type === 'link'"
-              :href="segment.value"
+              v-if="failedScreenshots.has(url)"
+              :href="url"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-pink-300 hover:text-pink-200 hover:underline"
-            >{{ segment.value }}</a>
-            <template v-else>
-              {{ segment.value }}
-            </template>
+              class="mt-0.5 block text-sm text-pink-300 hover:text-pink-200 hover:underline"
+            >{{ url }}</a>
+            <button
+              v-else
+              class="mt-1 block cursor-pointer overflow-hidden rounded-lg ring-1 ring-inset ring-slate-700 transition-opacity hover:opacity-90"
+              @click="openUrl(url)"
+            >
+              <img
+                :src="url"
+                alt="Screenshot"
+                loading="lazy"
+                class="block max-h-64 max-w-sm object-contain"
+                @error="handleScreenshotError(url)"
+              >
+            </button>
           </template>
-        </p>
+        </template>
       </div>
     </div>
   </div>
@@ -82,7 +110,7 @@
 
 <script setup lang="ts">
 import { IrcMessage } from '@/types'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { globalState } from '@/stores/global'
 import { parseNowPlaying, type NowPlaying } from '@/utils/nowPlaying'
@@ -108,7 +136,9 @@ const formattedTime = computed(() => {
   })
 })
 
-type MessageSegment = { type: 'text' | 'link', value: string }
+type MessageSegment = { type: 'text' | 'link' | 'screenshot', value: string }
+
+const SCREENSHOT_REGEX = /^https?:\/\/osu\.ppy\.sh\/ss\/\d+\/[\w-]+\/?$/
 
 const messageSegments = computed<MessageSegment[]>(() => {
   const text = props.message.message
@@ -121,7 +151,10 @@ const messageSegments = computed<MessageSegment[]>(() => {
     if (match.index > lastIndex) {
       segments.push({ type: 'text', value: text.slice(lastIndex, match.index) })
     }
-    segments.push({ type: 'link', value: match[0] })
+    segments.push({
+      type: SCREENSHOT_REGEX.test(match[0]) ? 'screenshot' : 'link',
+      value: match[0],
+    })
     lastIndex = match.index + match[0].length
   }
   if (lastIndex < text.length) {
@@ -129,6 +162,18 @@ const messageSegments = computed<MessageSegment[]>(() => {
   }
   return segments
 })
+
+// Text and links render inline in a paragraph; screenshots stack as blocks below.
+const textSegments = computed(() => messageSegments.value.filter(s => s.type !== 'screenshot'))
+const screenshotSegments = computed(() =>
+  messageSegments.value.filter(s => s.type === 'screenshot').map(s => s.value),
+)
+
+const failedScreenshots = ref<Set<string>>(new Set())
+
+const handleScreenshotError = (url: string) => {
+  failedScreenshots.value = new Set(failedScreenshots.value).add(url)
+}
 
 const handleUsernameClick = () => {
   if (props.message.username === 'BanchoBot') return
