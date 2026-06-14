@@ -10,6 +10,7 @@
 
   <aside
     ref="panel"
+    v-bind="$attrs"
     class="fixed bottom-safe top-safe z-40 flex w-80 max-w-[85%] transform flex-col bg-slate-900 lg:relative lg:top-auto lg:max-w-none lg:translate-x-0"
     :class="[
       side === 'left' ? 'left-safe border-r border-slate-800' : 'right-safe border-l border-slate-800',
