@@ -43,15 +43,16 @@
     >
       <button
         v-if="!isAtBottom && messages.length > 0"
-        class="fixed bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-10 inline-flex items-center gap-2 rounded-full bg-pink-500/15 px-3 py-2 text-xs font-medium text-pink-200 shadow-lg ring-1 ring-inset ring-pink-400/30 transition-colors hover:bg-pink-500/25 hover:text-pink-100"
-        :style="{ right: `${left + 22}px` }"
+        class="fixed bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] -translate-x-full z-10 inline-flex items-center gap-2 rounded-full bg-pink-500/15 px-3 py-2 text-xs font-medium text-pink-200 shadow-lg ring-1 ring-inset ring-pink-400/30 transition-colors hover:bg-pink-500/25 hover:text-pink-100"
+        :style="{ left: `${right - 22}px` }"
         @click="scrollToBottom"
       >
         <Icon
           name="arrowDown"
+          class="shrink-0"
           size="xs"
         />
-        <span class="hidden sm:block">New messages</span>
+        <span class="hidden whitespace-nowrap sm:block">New messages</span>
       </button>
     </Transition>
   </div>
@@ -80,7 +81,7 @@ const emit = defineEmits<{
 const messagesContainer = useTemplateRef('messagesContainer')
 const isAtBottom = ref(true)
 
-const { left } = useElementBounding(messagesContainer)
+const { right } = useElementBounding(messagesContainer)
 
 let savedScrollHeight = 0
 
