@@ -3,8 +3,11 @@ import { invoke } from '@tauri-apps/api/core'
 import { avatarCache } from '@/main'
 import { dbService } from '@/services/database'
 import { globalState } from '@/stores/global'
+import { RateLimiter } from '@/utils/rateLimiter'
 
 const inflightRequests = new Map<string, Promise<string>>()
+
+const avatarLimiter = new RateLimiter({ maxRequests: 3, intervalMs: 1000 })
 
 function loadAvatar(username: string): Promise<string> {
   const cached = avatarCache.get(username)
@@ -20,10 +23,12 @@ function loadAvatar(username: string): Promise<string> {
     const cachedAfterToken = avatarCache.get(username)
     if (cachedAfterToken !== undefined) return cachedAfterToken
 
-    const userData = await invoke<{ avatar_url?: string }>('fetch_user_data', {
-      username,
-      accessToken,
-    })
+    const userData = await avatarLimiter.schedule(() =>
+      invoke<{ avatar_url?: string }>('fetch_user_data', {
+        username,
+        accessToken,
+      }),
+    )
 
     const url = userData.avatar_url
     if (!url) throw new Error(`No avatar URL returned for ${username}`)
