@@ -28,7 +28,37 @@
           </span>
         </div>
 
-        <p class="mt-0.5 wrap-break-word text-sm text-slate-200">
+        <button
+          v-if="nowPlaying"
+          class="mt-1 cursor-pointer flex w-full max-w-md items-center gap-2.5 rounded-lg border border-pink-400/20 bg-pink-500/5 px-3 py-2 text-left transition-colors hover:border-pink-400/40 hover:bg-pink-500/10"
+          @click="handleNowPlayingClick"
+        >
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-pink-500/15 text-pink-200">
+            <Icon
+              name="musicCollection"
+              size="sm"
+            />
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block text-xs text-slate-400">is {{ nowPlaying.verb }}</span>
+            <span class="block truncate text-sm font-medium text-pink-100">{{ nowPlaying.title }}</span>
+          </span>
+          <span
+            v-if="nowPlaying.mods.length"
+            class="flex shrink-0 flex-wrap justify-end gap-1"
+          >
+            <Mod
+              v-for="mod in nowPlaying.mods"
+              :key="mod"
+              :mod="mod"
+            />
+          </span>
+        </button>
+
+        <p
+          v-else
+          class="mt-0.5 wrap-break-word text-sm text-slate-200"
+        >
           <template
             v-for="(segment, index) in messageSegments"
             :key="index"
@@ -55,7 +85,10 @@ import { IrcMessage } from '@/types'
 import { computed } from 'vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { globalState } from '@/stores/global'
+import { parseNowPlaying, type NowPlaying } from '@/utils/nowPlaying'
 import Avatar from '@/components/UI/Avatar.vue'
+import Icon from '@/components/UI/Icon.vue'
+import Mod from '@/components/Mod.vue'
 
 const props = defineProps<{
   message: IrcMessage
@@ -63,7 +96,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   clickUsername: [username: string]
+  clickBeatmap: [nowPlaying: NowPlaying]
 }>()
+
+const nowPlaying = computed(() => parseNowPlaying(props.message.message))
 
 const formattedTime = computed(() => {
   return new Date(props.message.timestamp * 1000).toLocaleTimeString([], {
@@ -101,5 +137,14 @@ const handleUsernameClick = () => {
     return
   }
   emit('clickUsername', props.message.username)
+}
+
+const handleNowPlayingClick = () => {
+  if (!nowPlaying.value) return
+  if (!globalState.isConnectedOsu) {
+    openUrl(nowPlaying.value.url)
+    return
+  }
+  emit('clickBeatmap', nowPlaying.value)
 }
 </script>

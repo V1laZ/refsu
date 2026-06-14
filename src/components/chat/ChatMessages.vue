@@ -29,6 +29,7 @@
         :key="`${message.timestamp}${index}`"
         :message="message"
         @click-username="emit('clickUsername', $event)"
+        @click-beatmap="emit('clickBeatmap', $event)"
       />
     </div>
 
@@ -42,7 +43,7 @@
     >
       <button
         v-if="!isAtBottom && messages.length > 0"
-        class="fixed bottom-[calc(env(safe-area-inset-bottom)+5.25rem)]  z-10 inline-flex items-center gap-2 rounded-full bg-pink-500/15 px-3 py-2 text-xs font-medium text-pink-200 shadow-lg ring-1 ring-inset ring-pink-400/30 transition-colors hover:bg-pink-500/25 hover:text-pink-100"
+        class="fixed bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-10 inline-flex items-center gap-2 rounded-full bg-pink-500/15 px-3 py-2 text-xs font-medium text-pink-200 shadow-lg ring-1 ring-inset ring-pink-400/30 transition-colors hover:bg-pink-500/25 hover:text-pink-100"
         :style="{ right: `${left + 22}px` }"
         @click="scrollToBottom"
       >
@@ -61,6 +62,7 @@ import { ref, onMounted, onUpdated, nextTick, onUnmounted, watch, useTemplateRef
 import Message from './Message.vue'
 import Icon from '@/components/UI/Icon.vue'
 import type { IrcMessage } from '@/types'
+import type { NowPlaying } from '@/utils/nowPlaying'
 import { useElementBounding } from '@vueuse/core'
 
 const props = defineProps<{
@@ -71,6 +73,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   clickUsername: [username: string]
+  clickBeatmap: [nowPlaying: NowPlaying]
   loadMore: []
 }>()
 

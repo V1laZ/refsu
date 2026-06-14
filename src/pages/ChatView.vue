@@ -62,6 +62,7 @@
         :has-more-messages="activeRoom.hasMoreMessages"
         class="grow"
         @click-username="handleClickUsername"
+        @click-beatmap="handleClickBeatmap"
         @load-more="loadMoreMessages"
       />
 
@@ -108,6 +109,12 @@
       v-model="playerModalOpen"
       :username="selectedPlayerUsername"
     />
+
+    <NowPlayingModal
+      v-if="nowPlayingModalOpen && selectedNowPlaying"
+      v-model="nowPlayingModalOpen"
+      :now-playing="selectedNowPlaying"
+    />
   </div>
 </template>
 
@@ -125,6 +132,8 @@ import MessageInput from '@/components/chat/MessageInput.vue'
 import SettingsModal from '@/components/modals/SettingsModal.vue'
 import CreateLobbyModal from '@/components/modals/CreateLobbyModal.vue'
 import PlayerModal from '@/components/modals/PlayerModal.vue'
+import NowPlayingModal from '@/components/modals/NowPlayingModal.vue'
+import type { NowPlaying } from '@/utils/nowPlaying'
 import { globalState } from '@/stores/global'
 import SelectMap from '@/components/Drawer/SelectMap.vue'
 import InvitePlayerModal from '@/components/modals/InvitePlayerModal.vue'
@@ -147,8 +156,10 @@ const settingsOpen = ref(false)
 const createLobbyOpen = ref(false)
 const invitePlayerOpen = ref(false)
 const playerModalOpen = ref(false)
+const nowPlayingModalOpen = ref(false)
 const settingsForNewLobby = ref<CreateLobbySettings | null>(null)
 const selectedPlayerUsername = ref<string | null>(null)
+const selectedNowPlaying = ref<NowPlaying | null>(null)
 
 let unlistenUserJoin: UnlistenFn | null = null
 
@@ -361,5 +372,10 @@ const handleCreateLobby = async (settings: CreateLobbySettings) => {
 const handleClickUsername = (username: string) => {
   selectedPlayerUsername.value = username
   playerModalOpen.value = true
+}
+
+const handleClickBeatmap = (nowPlaying: NowPlaying) => {
+  selectedNowPlaying.value = nowPlaying
+  nowPlayingModalOpen.value = true
 }
 </script>
