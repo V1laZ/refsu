@@ -187,6 +187,7 @@
 import { computed, ref, watch } from 'vue'
 import { dbService } from '@/services/database'
 import { extractMappoolFromSheet } from '@/services/sheetImport'
+import { globalState } from '@/stores/global'
 import Modal from '@/components/UI/Modal.vue'
 import Input from '@/components/UI/Input.vue'
 import Field from '@/components/UI/Field.vue'
@@ -273,7 +274,12 @@ const fetchSheet = async () => {
   loading.value = true
   error.value = ''
   try {
-    const result = await extractMappoolFromSheet(url.value.trim())
+    const accessToken = await dbService.getAccessToken(globalState.user ?? '')
+    if (!accessToken) {
+      error.value = 'Connect your osu! account to import from a sheet.'
+      return
+    }
+    const result = await extractMappoolFromSheet(url.value.trim(), accessToken)
     if (!result.rounds.length) {
       error.value = 'No mappool could be detected in that sheet.'
       return

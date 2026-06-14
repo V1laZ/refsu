@@ -210,8 +210,12 @@ class DatabaseService {
 
   private async refreshToken(username: string, oldRefreshToken: string): Promise<string | null> {
     const res = await fetch(
-      `https://refsu.vilaz.dev/refresh-token?refresh_token=${oldRefreshToken}`,
-      { method: 'POST' },
+      'https://refsu.vilaz.dev/refresh-token',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: oldRefreshToken }),
+      },
     )
 
     if (!res.ok) {

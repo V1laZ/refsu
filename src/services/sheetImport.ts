@@ -3,10 +3,13 @@ import type { ExtractedRound, ExtractedSheet } from '@/types'
 
 const EXTRACT_URL = 'https://refsu.vilaz.dev/extract-mappool'
 
-export async function extractMappoolFromSheet(url: string): Promise<ExtractedSheet> {
+export async function extractMappoolFromSheet(url: string, accessToken: string): Promise<ExtractedSheet> {
   const res = await fetch(EXTRACT_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
     body: JSON.stringify({ url }),
   })
 
