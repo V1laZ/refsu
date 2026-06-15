@@ -73,6 +73,7 @@ pub fn run() {
             fetch_user_data,
             set_mappool,
             set_map_drain_time,
+            set_lobby_command_defaults,
             get_room_state,
             get_room_messages_page,
             check_for_updates,

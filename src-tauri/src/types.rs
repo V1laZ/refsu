@@ -200,6 +200,8 @@ pub struct LobbyState {
     pub map_drain_time: Option<u32>,
     pub timer_start_time: Option<u64>,
     pub timer_duration: Option<u32>,
+    pub default_timer_seconds: u32,
+    pub default_start_seconds: u32,
 }
 
 impl LobbyState {
@@ -219,6 +221,8 @@ impl LobbyState {
             map_drain_time: None,
             timer_start_time: None,
             timer_duration: None,
+            default_timer_seconds: 30,
+            default_start_seconds: 10,
         }
     }
 }

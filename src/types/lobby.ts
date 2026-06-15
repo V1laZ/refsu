@@ -49,6 +49,8 @@ export type LobbyState = {
   mapDrainTime: number | null
   timerStartTime: number | null
   timerDuration: number | null
+  defaultTimerSeconds: number
+  defaultStartSeconds: number
 }
 
 export type CreateLobbySettings = {

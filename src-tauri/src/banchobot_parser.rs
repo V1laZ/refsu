@@ -90,10 +90,10 @@ impl BanchoBotParser {
             static_regex!(r"^Team mode: (.+), Win condition: (.+)$").captures(text)
         {
             let team_mode = match captures.get(1).unwrap().as_str() {
-                "Head To Head" => "HeadToHead",
-                "Tag Coop" => "TagCoop",
-                "Team Vs" => "TeamVs",
-                "Tag Team Vs" => "TagTeamVs",
+                "Head To Head" | "HeadToHead" => "HeadToHead",
+                "Tag Coop" | "TagCoop" => "TagCoop",
+                "Team Vs" | "TeamVs" => "TeamVs",
+                "Tag Team Vs" | "TagTeamVs" => "TagTeamVs",
                 _ => "HeadToHead",
             };
 
@@ -101,7 +101,7 @@ impl BanchoBotParser {
                 "Score" => "Score",
                 "Accuracy" => "Accuracy",
                 "Combo" => "Combo",
-                "Score V2" => "ScoreV2",
+                "Score V2" | "ScoreV2" => "ScoreV2",
                 _ => "Score",
             };
 
@@ -334,6 +334,52 @@ impl BanchoBotParser {
                 channel,
                 |settings| {
                     settings.room_name = room_name.clone();
+                },
+                state,
+                app_handle,
+            );
+            return true;
+        }
+
+        if let Some(captures) =
+            static_regex!(r"^Changed match settings to (.+)$").captures(text)
+        {
+            let settings_str = captures.get(1).unwrap().as_str();
+
+            let mut new_team_mode: Option<&str> = None;
+            let mut new_win_condition: Option<&str> = None;
+            let mut new_size: Option<u8> = None;
+
+            for token in settings_str.split(", ") {
+                match token {
+                    "HeadToHead" | "TagCoop" | "TeamVs" | "TagTeamVs" => {
+                        new_team_mode = Some(token);
+                    }
+                    "Score" | "Accuracy" | "Combo" | "ScoreV2" => {
+                        new_win_condition = Some(token);
+                    }
+                    _ => {
+                        if let Some(size_caps) = static_regex!(r"^(\d+) slots$").captures(token) {
+                            if let Ok(size) = size_caps.get(1).unwrap().as_str().parse::<u8>() {
+                                new_size = Some(size);
+                            }
+                        }
+                    }
+                }
+            }
+
+            Self::update_lobby_settings(
+                channel,
+                |settings| {
+                    if let Some(team_mode) = new_team_mode {
+                        settings.team_mode = team_mode.to_string();
+                    }
+                    if let Some(win_condition) = new_win_condition {
+                        settings.win_condition = win_condition.to_string();
+                    }
+                    if let Some(size) = new_size {
+                        settings.size = size;
+                    }
                 },
                 state,
                 app_handle,

@@ -387,6 +387,40 @@ pub async fn set_map_drain_time(
 }
 
 #[tauri::command]
+pub async fn set_lobby_command_defaults(
+    room_id: String,
+    timer_seconds: u32,
+    start_seconds: u32,
+    state: State<'_, IrcState>,
+    app_handle: tauri::AppHandle,
+) -> Result<(), String> {
+    let (lobby, is_active) = {
+        let mut irc_state = state.lock().unwrap();
+        let is_active = irc_state.active_room_id.as_deref() == Some(&room_id);
+        let room = irc_state
+            .rooms
+            .get_mut(&room_id)
+            .ok_or_else(|| "Room not found".to_string())?;
+        let lobby = room
+            .lobby_state
+            .as_mut()
+            .ok_or_else(|| "Lobby not found".to_string())?;
+        lobby.default_timer_seconds = timer_seconds;
+        lobby.default_start_seconds = start_seconds;
+        (lobby.clone(), is_active)
+    };
+
+    if is_active {
+        let _ = app_handle.emit(
+            "active-room-lobby-state-updated",
+            serde_json::json!({ "lobbyState": lobby }),
+        );
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn fetch_beatmap_data(
     beatmap_id: String,
     access_token: String,

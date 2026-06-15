@@ -38,7 +38,7 @@
             variant="success"
             size="sm"
             :disabled="!currentMap"
-            @click="emit('sendMessage', '!mp start 10')"
+            @click="emit('sendMessage', `!mp start ${lobbyState.defaultStartSeconds}`)"
           >
             Start
           </Btn>
@@ -100,6 +100,13 @@
               </div>
             </Transition>
           </div>
+          <IconBtn
+            icon="settings"
+            size="sm"
+            variant="ghost"
+            title="Lobby settings"
+            @click="showSettingsModal = true"
+          />
         </template>
       </div>
     </div>
@@ -135,6 +142,12 @@
         </Badge>
       </div>
     </div>
+
+    <LobbySettingsModal
+      v-model="showSettingsModal"
+      :room="room"
+      @send-message="emit('sendMessage', $event)"
+    />
   </div>
 </template>
 
@@ -147,6 +160,7 @@ import Badge from '@/components/UI/Badge.vue'
 import StatusDot from '@/components/UI/StatusDot.vue'
 import Input from '@/components/UI/Input.vue'
 import Field from '@/components/UI/Field.vue'
+import LobbySettingsModal from '@/components/modals/LobbySettingsModal.vue'
 import { useMatchCountdown } from '@/composables/useMatchCountdown'
 import { useTimerCountdown } from '@/composables/useTimerCountdown'
 import { confirm } from '@/composables/useConfirm'
@@ -168,9 +182,10 @@ const roomId = computed(() => props.room.id)
 const { formattedTime: formattedMatchTime } = useMatchCountdown(lobbyState, roomId)
 const { formattedTime: formattedTimerTime, isActive: timerIsActive } = useTimerCountdown(lobbyState)
 
+const showSettingsModal = ref(false)
 const showTimerPopup = ref(false)
 const timerMinutes = ref(0)
-const timerSeconds = ref(30)
+const timerSeconds = ref(0)
 const timerTotalSeconds = computed(() => timerMinutes.value * 60 + timerSeconds.value)
 
 async function handleTimerButtonClick() {
@@ -183,6 +198,11 @@ async function handleTimerButtonClick() {
     })
     if (ok) emit('sendMessage', '!mp aborttimer')
     return
+  }
+  if (!showTimerPopup.value) {
+    const defaultSeconds = lobbyState.value.defaultTimerSeconds
+    timerMinutes.value = Math.floor(defaultSeconds / 60)
+    timerSeconds.value = defaultSeconds % 60
   }
   showTimerPopup.value = !showTimerPopup.value
 }
