@@ -630,6 +630,16 @@ impl BanchoBotParser {
 
                 Self::emit_lobby_update(channel, lobby, active_room_id.as_deref(), app_handle);
 
+                if previous != status {
+                    let _ = app_handle.emit(
+                        "room-match-status-updated",
+                        serde_json::json!({
+                            "roomId": channel,
+                            "matchStatus": status,
+                        }),
+                    );
+                }
+
                 let sound = match (previous.as_str(), status) {
                     (prev, "ready") if prev != "ready" => Some(SoundNotificationKind::AllReady),
                     (prev, "active") if prev != "active" => Some(SoundNotificationKind::MatchStart),

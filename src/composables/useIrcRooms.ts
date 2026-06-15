@@ -7,6 +7,7 @@ import type {
   ActiveRoomMessageEvent,
   InactiveRoomUnreadUpdateEvent,
   ActiveRoomLobbyStateUpdateEvent,
+  RoomMatchStatusUpdateEvent,
   RoomsListUpdatedEvent,
   RoomError,
   MessagesPage,
@@ -118,6 +119,11 @@ export function useIrcRooms() {
         if (activeRoom.value?.roomType === 'MultiplayerLobby') {
           activeRoom.value.lobbyState = payload.lobbyState
         }
+      }),
+
+      await listen<RoomMatchStatusUpdateEvent>('room-match-status-updated', ({ payload }) => {
+        const room = roomsMap.value.get(payload.roomId)
+        if (room) room.matchStatus = payload.matchStatus
       }),
 
       await listen<RoomsListUpdatedEvent>('rooms-list-updated', ({ payload }) => {

@@ -129,6 +129,7 @@ pub struct RoomListItem {
     pub display_name: String,
     pub room_type: RoomType,
     pub unread_count: u32,
+    pub match_status: Option<String>,
 }
 
 impl From<&Room> for RoomListItem {
@@ -138,6 +139,10 @@ impl From<&Room> for RoomListItem {
             display_name: room.display_name.clone(),
             room_type: room.room_type.clone(),
             unread_count: room.unread_count,
+            match_status: room
+                .lobby_state
+                .as_ref()
+                .map(|lobby| lobby.match_status.clone()),
         }
     }
 }
@@ -311,10 +316,3 @@ pub struct ConnectionConfig {
 }
 
 pub type IrcState = Arc<Mutex<IrcClientState>>;
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct OAuthCallbackData {
-    pub access_token: String,
-    pub refresh_token: String,
-    pub expires_in: i32,
-}

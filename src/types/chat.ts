@@ -35,7 +35,9 @@ export type PrivateMessageRoom = RoomBase & {
 
 export type RoomUnion = MultiplayerRoom | ChannelRoom | PrivateMessageRoom
 
-export type RoomListItem = Omit<RoomUnion, 'messages' | 'lobbyState'>
+export type RoomListItem = Omit<RoomUnion, 'messages' | 'lobbyState'> & {
+  matchStatus: LobbyState['matchStatus'] | null
+}
 
 export type RoomsMap = Map<string, RoomListItem>
 
@@ -74,6 +76,11 @@ export type ActiveRoomLobbyStateUpdateEvent = {
 export type RoomsListUpdatedEvent = {
   rooms: RoomListItem[]
   activeRoomId: string | null
+}
+
+export type RoomMatchStatusUpdateEvent = {
+  roomId: string
+  matchStatus: LobbyState['matchStatus']
 }
 
 export type SoundNotificationType = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
