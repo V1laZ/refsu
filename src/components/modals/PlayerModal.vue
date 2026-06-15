@@ -3,6 +3,7 @@
     v-model="modelValue"
     size="sm"
     body-padding="none"
+    title="Player"
   >
     <template #header>
       <div class="sr-only">
@@ -20,7 +21,7 @@
     <template v-else>
       <div class="border-b border-slate-800 px-5 py-5">
         <div class="flex items-center gap-4">
-          <div class="size-16 flex-shrink-0 overflow-hidden rounded-full ring-2 ring-inset ring-pink-400/30">
+          <div class="size-16 shrink-0 overflow-hidden rounded-full ring-2 ring-inset ring-pink-400/30">
             <img
               v-if="player?.avatar_url"
               :src="player.avatar_url"

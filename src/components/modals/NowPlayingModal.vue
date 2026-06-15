@@ -3,6 +3,7 @@
     v-model="modelValue"
     size="sm"
     body-padding="none"
+    title="Beatmap"
   >
     <template #header>
       <div class="sr-only">
