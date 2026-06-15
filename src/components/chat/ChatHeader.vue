@@ -35,19 +35,10 @@
       />
 
       <IconBtn
-        v-if="!isMpLobby"
         icon="settings"
         size="sm"
         title="Settings"
         @click="emit('openSettings')"
-      />
-
-      <IconBtn
-        v-if="isMpLobby"
-        icon="refresh"
-        size="sm"
-        title="Refresh"
-        @click="emit('refresh')"
       />
 
       <IconBtn

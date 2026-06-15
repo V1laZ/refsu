@@ -101,6 +101,12 @@
             </Transition>
           </div>
           <IconBtn
+            icon="refresh"
+            size="sm"
+            title="Refresh"
+            @click="emit('sendMessage', '!mp settings')"
+          />
+          <IconBtn
             icon="settings"
             size="sm"
             variant="ghost"
