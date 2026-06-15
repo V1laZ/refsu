@@ -2,6 +2,7 @@
   <Drawer
     side="right"
     :open="open"
+    class="lg:min-w-76 lg:max-w-76 lg:w-76"
     @update:open="emit('update:open', $event)"
   >
     <header class="flex items-start justify-between gap-2 border-b border-slate-800 px-4 py-3">

@@ -1,6 +1,6 @@
 <template>
   <Drawer
-    class="lg:min-w-64 lg:max-w-64 lg:w-64"
+    class="lg:min-w-76 lg:max-w-76 lg:w-76"
     side="left"
     :open="open"
     @update:open="emit('update:open', $event)"
