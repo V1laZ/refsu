@@ -3,14 +3,8 @@
     v-model="modelValue"
     size="sm"
     body-padding="none"
-    title="Beatmap"
+    title="Beatmap Info"
   >
-    <template #header>
-      <div class="sr-only">
-        Now playing
-      </div>
-    </template>
-
     <div
       v-if="loading"
       class="p-8"

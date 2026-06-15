@@ -3,14 +3,8 @@
     v-model="modelValue"
     size="sm"
     body-padding="none"
-    title="Player"
+    title="Player Info"
   >
-    <template #header>
-      <div class="sr-only">
-        Player info
-      </div>
-    </template>
-
     <div
       v-if="loading"
       class="p-8"
