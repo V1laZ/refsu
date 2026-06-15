@@ -108,12 +108,15 @@ import { modalsState } from './stores/global'
 import { UpdateInfo, UserCredentials } from '@/types'
 import { platform } from '@tauri-apps/plugin-os'
 import { useAndroidBackButton } from './composables/useAndroidBackButton'
+import { soundService } from './services/sound'
+import { useSoundNotifications } from './composables/useSoundNotifications'
 
 const router = useRouter()
 const currentPlatform = platform()
 const showTitleBar = currentPlatform !== 'ios' && currentPlatform !== 'android'
 
 useAndroidBackButton()
+useSoundNotifications()
 
 if (typeof document !== 'undefined') {
   document.documentElement.style.setProperty('--title-bar-h', showTitleBar ? '2rem' : '0px')
@@ -213,6 +216,8 @@ async function checkForUpdates() {
 }
 
 onMounted(async () => {
+  soundService.init()
+
   unlistenDisconnect = await listen('irc-disconnected', handleOfflineState)
   unlistenIsAuthenticated = await listen<boolean>('is-authenticated', ({ payload }) => {
     handleIsAuthenticated(payload)

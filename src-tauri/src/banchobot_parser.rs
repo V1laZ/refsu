@@ -598,6 +598,7 @@ impl BanchoBotParser {
         let active_room_id = irc_state.active_room_id.clone();
         if let Some(room) = irc_state.rooms.get_mut(channel) {
             if let Some(lobby) = &mut room.lobby_state {
+                let previous = lobby.match_status.clone();
                 lobby.match_status = status.to_string();
 
                 match status {
@@ -628,6 +629,16 @@ impl BanchoBotParser {
                 }
 
                 Self::emit_lobby_update(channel, lobby, active_room_id.as_deref(), app_handle);
+
+                let sound = match (previous.as_str(), status) {
+                    (prev, "ready") if prev != "ready" => Some(SoundNotificationKind::AllReady),
+                    (prev, "active") if prev != "active" => Some(SoundNotificationKind::MatchStart),
+                    ("active", "idle") => Some(SoundNotificationKind::MatchFinish),
+                    _ => None,
+                };
+                if let Some(kind) = sound {
+                    emit_sound_notification(app_handle, kind, channel);
+                }
             }
         }
     }

@@ -188,12 +188,12 @@ fn handle_incoming_message(
 
                 let is_private = !room.starts_with("#");
 
-                let room_id = if is_private {
-                    let current_username = {
-                        let irc_state = state.lock().unwrap();
-                        irc_state.current_username.clone().unwrap_or_default()
-                    };
+                let current_username = {
+                    let irc_state = state.lock().unwrap();
+                    irc_state.current_username.clone().unwrap_or_default()
+                };
 
+                let room_id = if is_private {
                     if nick == current_username {
                         // This is our outgoing message, use recipient as room ID
                         room.clone()
@@ -260,6 +260,22 @@ fn handle_incoming_message(
                             "unreadCount": unread_count
                         }),
                     );
+                }
+
+                let is_own = nick.eq_ignore_ascii_case(&current_username);
+                let is_bot = nick.eq_ignore_ascii_case("BanchoBot");
+                if !is_own && !is_bot {
+                    let is_mention = !current_username.is_empty()
+                        && text
+                            .to_lowercase()
+                            .contains(&current_username.to_lowercase());
+                    if is_private || is_mention {
+                        emit_sound_notification(
+                            app_handle,
+                            SoundNotificationKind::Mention,
+                            &room_id,
+                        );
+                    }
                 }
             }
         }

@@ -75,3 +75,10 @@ export type RoomsListUpdatedEvent = {
   rooms: RoomListItem[]
   activeRoomId: string | null
 }
+
+export type SoundNotificationType = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
+
+export type SoundNotificationEvent = {
+  type: SoundNotificationType
+  roomId: string
+}

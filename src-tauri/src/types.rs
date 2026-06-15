@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use tauri::Emitter;
 
 // Room types
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -270,6 +271,37 @@ pub struct IrcMessage {
     pub message: String,
     pub timestamp: u64,
     pub is_private: bool,
+}
+
+#[derive(Debug, Serialize, Clone, Copy)]
+#[serde(rename_all = "camelCase")]
+pub enum SoundNotificationKind {
+    Mention,
+    MatchStart,
+    MatchFinish,
+    AllReady,
+}
+
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct SoundNotification {
+    #[serde(rename = "type")]
+    pub kind: SoundNotificationKind,
+    pub room_id: String,
+}
+
+pub fn emit_sound_notification(
+    app_handle: &tauri::AppHandle,
+    kind: SoundNotificationKind,
+    room_id: &str,
+) {
+    let _ = app_handle.emit(
+        "sound-notification",
+        SoundNotification {
+            kind,
+            room_id: room_id.to_string(),
+        },
+    );
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
