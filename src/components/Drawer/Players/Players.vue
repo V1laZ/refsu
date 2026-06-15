@@ -36,7 +36,7 @@
           v-for="(slot, idx) in lobbyState.slots"
           :key="slot.id"
           :slot-info="slot"
-          @player-move="emit('move', { playerName: $event, to: idx + 1 })"
+          :index="idx"
           @team-change="emit('teamChange', $event)"
           @host="emit('host', $event)"
         />
@@ -46,8 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, provide } from 'vue'
 import PlayerSlot from './PlayerSlot.vue'
+import { createPlayerDrag, playerDragKey } from './usePlayerDrag'
 import Drawer from '@/components/UI/Drawer.vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
 import type { LobbyState, PlayerMoveEvent, PlayerTeamChangeEvent } from '@/types'
@@ -64,6 +65,13 @@ const emit = defineEmits<{
   'host': [host: string | null]
   'openInvitePlayer': []
 }>()
+
+provide(
+  playerDragKey,
+  createPlayerDrag((playerName, targetIndex) =>
+    emit('move', { playerName, to: targetIndex + 1 }),
+  ),
+)
 
 const occupiedSlots = computed(() =>
   props.lobbyState.slots.filter(slot => slot.player !== null).length || 0,
