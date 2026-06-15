@@ -565,6 +565,11 @@ impl BanchoBotParser {
                     }
                     "idle" => {
                         lobby.match_start_time = None;
+                        for slot in &mut lobby.slots {
+                            if let Some(ref mut player) = slot.player {
+                                player.is_ready = false;
+                            }
+                        }
                     }
                     "ready" => {
                         for slot in &mut lobby.slots {
