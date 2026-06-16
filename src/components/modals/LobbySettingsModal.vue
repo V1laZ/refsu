@@ -11,7 +11,6 @@
     >
       <Field label="Game name">
         <Input
-          ref="gameNameInputRef"
           v-model="gameName"
           placeholder="Enter game name"
           :maxlength="50"
@@ -116,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { invoke } from '@tauri-apps/api/core'
 import Modal from '@/components/UI/Modal.vue'
 import Btn from '@/components/UI/Btn.vue'
@@ -135,7 +134,6 @@ const emit = defineEmits<{
   sendMessage: [message: string]
 }>()
 
-// osu! `!mp set <teammode> <wincondition>` use numeric codes; LobbySettings stores names.
 const TEAM_MODE_TO_CODE: Record<LobbySettings['teamMode'], string> = {
   HeadToHead: '0',
   TagCoop: '1',
@@ -149,7 +147,6 @@ const WIN_CONDITION_TO_CODE: Record<LobbySettings['winCondition'], string> = {
   ScoreV2: '3',
 }
 
-// Team vs ('2') and Tag team vs ('3') assign players to red/blue teams; the others don't.
 const usesTeams = (teamModeCode: string) => teamModeCode === '2' || teamModeCode === '3'
 
 const loading = ref(false)
@@ -160,8 +157,6 @@ const timerMinutes = ref(0)
 const timerSeconds = ref(0)
 const startMinutes = ref(0)
 const startSeconds = ref(0)
-
-const gameNameInputRef = useTemplateRef<{ focus: () => void }>('gameNameInputRef')
 
 // Snapshot of the values loaded into the form, so we only send IRC commands for changes.
 let initialGameName = ''
@@ -227,7 +222,6 @@ const handleSave = async () => {
 watch(open, (newValue) => {
   if (newValue) {
     loadFromState()
-    nextTick(() => gameNameInputRef.value?.focus())
   }
 }, { immediate: true, flush: 'post' })
 </script>
