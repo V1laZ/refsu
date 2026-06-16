@@ -6,7 +6,7 @@
           :tone="statusDotTone"
           :pulse="room.lobbyState.matchStatus === 'active'"
         />
-        <span class="text-sm font-medium text-slate-200">
+        <span class="text-sm hidden sm:block font-medium text-slate-200">
           {{ matchStatusText }}
         </span>
         <span
