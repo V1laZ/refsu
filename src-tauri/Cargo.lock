@@ -3986,6 +3986,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-android-battery-optimization",
  "tauri-plugin-deep-link",
  "tauri-plugin-http",
  "tauri-plugin-opener",
@@ -5414,6 +5415,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-android-battery-optimization"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed133d755463a74d68c1d79ecedca22dd2266775c342930e8f4fc0843f290b00"
+dependencies = [
+ "log",
+ "serde",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.12",
+]
+
+[[package]]
 name = "tauri-plugin-deep-link"
 version = "2.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5686,7 +5700,7 @@ dependencies = [
  "serde_with",
  "swift-rs",
  "thiserror 2.0.12",
- "toml 0.9.8",
+ "toml 1.1.2+spec-1.1.0",
  "url",
  "urlpattern",
  "uuid",

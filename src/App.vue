@@ -71,6 +71,8 @@
 
     <OAuthCallback v-if="modalsState.showOAuthCallback" />
 
+    <BatteryOptimizationModal v-model="showBatteryModal" />
+
     <ConfirmDialog />
 
     <Transition
@@ -98,6 +100,8 @@ import { dbService } from './services/database'
 import { globalState } from './stores/global'
 import { type UnlistenFn, listen } from '@tauri-apps/api/event'
 import OAuthCallback from './components/modals/OAuthCallback.vue'
+import BatteryOptimizationModal from './components/modals/BatteryOptimizationModal.vue'
+import { checkBatteryOptimizationStatus } from 'tauri-plugin-android-battery-optimization-api'
 import UpdateToast from './components/UI/UpdateToast.vue'
 import Spinner from './components/UI/Spinner.vue'
 import TitleBar from './components/UI/TitleBar.vue'
@@ -128,6 +132,7 @@ const loadingMessage = ref('Loading...')
 const errorMessage = ref('')
 const isAuthenticated = ref(true)
 const updateInfo = ref<UpdateInfo | null>(null)
+const showBatteryModal = ref(false)
 
 let unlistenDisconnect: UnlistenFn | null = null
 let unlistenIsAuthenticated: UnlistenFn | null = null
@@ -215,6 +220,17 @@ async function checkForUpdates() {
   }
 }
 
+async function checkBatteryOptimization() {
+  if (currentPlatform !== 'android') return
+  try {
+    const status = await checkBatteryOptimizationStatus()
+    showBatteryModal.value = !status.isIgnoringOptimizations
+  }
+  catch (error) {
+    console.error('Battery optimization check failed:', error)
+  }
+}
+
 onMounted(async () => {
   soundService.init()
 
@@ -232,6 +248,7 @@ onMounted(async () => {
     const saved = await dbService.getCredentials()
     if (saved) {
       await connectWithCredentials(saved)
+      checkBatteryOptimization()
     }
     else {
       loading.value = false

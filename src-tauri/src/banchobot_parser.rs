@@ -341,9 +341,7 @@ impl BanchoBotParser {
             return true;
         }
 
-        if let Some(captures) =
-            static_regex!(r"^Changed match settings to (.+)$").captures(text)
-        {
+        if let Some(captures) = static_regex!(r"^Changed match settings to (.+)$").captures(text) {
             let settings_str = captures.get(1).unwrap().as_str();
 
             let mut new_team_mode: Option<&str> = None;

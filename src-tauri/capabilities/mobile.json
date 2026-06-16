@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Mobile-only capabilities (Android battery optimization)",
+  "platforms": [
+    "android"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "android-battery-optimization:default"
+  ]
+}

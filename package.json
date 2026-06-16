@@ -24,6 +24,7 @@
     "@tauri-apps/plugin-updater": "^2.10.1",
     "@vueuse/core": "^14.3.0",
     "sortablejs": "^1.15.7",
+    "tauri-plugin-android-battery-optimization-api": "^0.1.0",
     "vue": "3.5.34",
     "vue-router": "^5.0.7"
   },

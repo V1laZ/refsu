@@ -47,6 +47,11 @@ pub fn run() {
             .plugin(tauri_plugin_process::init());
     }
 
+    #[cfg(target_os = "android")]
+    {
+        builder = builder.plugin(tauri_plugin_android_battery_optimization::init());
+    }
+
     builder
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -104,15 +109,14 @@ pub fn run() {
                     return;
                 };
 
-                let decoded_bytes = match base64::engine::general_purpose::STANDARD
-                    .decode(base64_data)
-                {
-                    Ok(b) => b,
-                    Err(e) => {
-                        eprintln!("Deep link `data` is not valid base64: {}", e);
-                        return;
-                    }
-                };
+                let decoded_bytes =
+                    match base64::engine::general_purpose::STANDARD.decode(base64_data) {
+                        Ok(b) => b,
+                        Err(e) => {
+                            eprintln!("Deep link `data` is not valid base64: {}", e);
+                            return;
+                        }
+                    };
                 let decoded_string = match String::from_utf8(decoded_bytes) {
                     Ok(s) => s,
                     Err(e) => {
