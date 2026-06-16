@@ -5,13 +5,6 @@
     size="sm"
   >
     <div class="space-y-4">
-      <div class="flex size-11 items-center justify-center rounded-full bg-amber-500/15 text-amber-300 ring-1 ring-inset ring-amber-400/30">
-        <Icon
-          name="alert"
-          size="lg"
-        />
-      </div>
-
       <p class="text-sm text-slate-300">
         Without disabling battery optimization, Refsu won't work properly and you'll
         keep disconnecting from Bancho.
