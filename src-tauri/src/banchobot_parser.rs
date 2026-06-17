@@ -410,8 +410,12 @@ impl BanchoBotParser {
                         if let Some(ref mut player) = slot.player {
                             if player.username == username {
                                 player.team = Some(team.clone());
+                                player.is_ready = false;
                             }
                         }
+                    }
+                    if lobby.match_status == "ready" {
+                        lobby.match_status = "idle".to_string();
                     }
                     Self::emit_lobby_update(channel, lobby, active_room_id.as_deref(), app_handle);
                 }
