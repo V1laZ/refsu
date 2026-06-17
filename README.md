@@ -14,13 +14,6 @@ A modern, cross-platform IRC client specifically designed for osu! referees and 
 - One-click UI for frequently used commands
 - Create mappools and select maps in lobby with ease 
 
-## 📷 Screenshots
-<img src="https://github.com/user-attachments/assets/c5c7e83a-1f78-4582-92b6-b31b124b478e" width="250" />
-<img src="https://github.com/user-attachments/assets/7bfd8888-142f-42d1-9bc4-b8240fdd2568" width="250" />
-<img src="https://github.com/user-attachments/assets/c8d9fc2b-58bc-443f-a103-1325997ddbe9" width="250" />
-<img src="https://github.com/user-attachments/assets/68155eb7-6af0-4e28-8f27-1e54cd7ee4d3" width="250" />
-<img src="https://github.com/user-attachments/assets/58e4b0ec-0188-4f76-a039-995819fa6140" width="250" />
-
 ## 🖥️ Development
 
 ### Prerequisites
