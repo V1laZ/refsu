@@ -17,49 +17,26 @@ jobs:
           - platform: 'ubuntu-24.04'
             args: ''
           - platform: 'windows-latest'
-            args: ''
+            args: '--bundles nsis'
 
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract version from tag
-        id: version
+      - name: Check version consistency
         shell: bash
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
-          else
-            VERSION="0.0.0"
+          PKG=$(grep -m1 '"version"' package.json | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')
+          CARGO=$(grep -m1 '^version[[:space:]]*=' src-tauri/Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')
+          CONF=$(grep -m1 '"version"' src-tauri/tauri.conf.json | sed -E 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')
+          echo "package.json:    $PKG"
+          echo "Cargo.toml:      $CARGO"
+          echo "tauri.conf.json: $CONF"
+          if [ "$PKG" != "$CARGO" ] || [ "$PKG" != "$CONF" ]; then
+            echo "::error::Version mismatch — package.json ($PKG), Cargo.toml ($CARGO), tauri.conf.json ($CONF). Bump all three to the same version before releasing."
+            exit 1
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Version: $VERSION"
-
-      - name: Update version in files
-        shell: bash
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-
-          # Update package.json
-          if [ -f "package.json" ]; then
-            sed -i.bak "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" package.json
-            rm -f package.json.bak
-            echo "Updated package.json to version $VERSION"
-          fi
-
-          # Update Cargo.toml
-          if [ -f "src-tauri/Cargo.toml" ]; then
-            sed -i.bak "s/^version = \".*\"/version = \"$VERSION\"/" src-tauri/Cargo.toml
-            rm -f src-tauri/Cargo.toml.bak
-            echo "Updated Cargo.toml to version $VERSION"
-          fi
-
-          # Update tauri.conf.json
-          if [ -f "src-tauri/tauri.conf.json" ]; then
-            sed -i.bak "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" src-tauri/tauri.conf.json
-            rm -f src-tauri/tauri.conf.json.bak
-            echo "Updated tauri.conf.json to version $VERSION"
-          fi
+          echo "All versions match: $PKG"
 
       - name: setup node
         uses: actions/setup-node@v4
