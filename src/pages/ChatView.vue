@@ -29,7 +29,7 @@
         :has-unread="hasUnreadInOtherRooms"
         @toggle-left-drawer="leftDrawerOpen = !leftDrawerOpen"
         @toggle-right-drawer="rightDrawerOpen = !rightDrawerOpen"
-        @open-settings="settingsOpen = true"
+        @open-settings="router.push('/settings')"
         @open-mappools="router.push('/mappools')"
         @refresh="refreshLobbyState"
       />
@@ -88,11 +88,6 @@
       @open-invite-player="invitePlayerOpen = true"
     />
 
-    <SettingsModal
-      v-model="settingsOpen"
-      @logout="handleLogout"
-    />
-
     <CreateLobbyModal
       v-if="createLobbyOpen"
       v-model="createLobbyOpen"
@@ -129,7 +124,6 @@ import ChatHeader from '@/components/chat/ChatHeader.vue'
 import QuickActionBar from '@/components/chat/QuickActionBar.vue'
 import ChatMessages from '@/components/chat/ChatMessages.vue'
 import MessageInput from '@/components/chat/MessageInput.vue'
-import SettingsModal from '@/components/modals/SettingsModal.vue'
 import CreateLobbyModal from '@/components/modals/CreateLobbyModal.vue'
 import PlayerModal from '@/components/modals/PlayerModal.vue'
 import NowPlayingModal from '@/components/modals/NowPlayingModal.vue'
@@ -152,7 +146,6 @@ const hasUnreadInOtherRooms = computed(() =>
 const isOpenSelectMap = ref(false)
 const leftDrawerOpen = ref(false)
 const rightDrawerOpen = ref(false)
-const settingsOpen = ref(false)
 const createLobbyOpen = ref(false)
 const invitePlayerOpen = ref(false)
 const playerModalOpen = ref(false)
@@ -317,20 +310,6 @@ const sendMessage = async (messageText: string) => {
   }
   catch (error) {
     console.error('Failed to send message:', error)
-  }
-}
-
-const handleLogout = async () => {
-  globalState.isLoggingOut = true
-  try {
-    await invoke('disconnect_from_bancho')
-    globalState.user = null
-    globalState.isConnected = false
-    router.replace('/login')
-  }
-  catch (error) {
-    console.error('Failed to logout:', error)
-    globalState.isLoggingOut = false
   }
 }
 
