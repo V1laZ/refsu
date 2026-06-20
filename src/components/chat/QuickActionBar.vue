@@ -68,8 +68,8 @@
             >
               <div
                 v-if="showTimerPopup"
+                ref="timerPopupEl"
                 class="absolute right-0 top-full z-50 mt-2 w-60 rounded-lg border border-slate-800 bg-slate-900 p-3 shadow-xl"
-                @click.self="showTimerPopup = false"
               >
                 <p class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
                   Countdown timer
@@ -158,7 +158,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 import Mod from '@/components/Mod.vue'
 import Btn from '@/components/UI/Btn.vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
@@ -193,6 +194,12 @@ const showTimerPopup = ref(false)
 const timerMinutes = ref(0)
 const timerSeconds = ref(0)
 const timerTotalSeconds = computed(() => timerMinutes.value * 60 + timerSeconds.value)
+
+const timerPopupEl = useTemplateRef('timerPopupEl')
+
+onClickOutside(timerPopupEl, () => {
+  showTimerPopup.value = false
+})
 
 async function handleTimerButtonClick() {
   if (timerIsActive.value) {

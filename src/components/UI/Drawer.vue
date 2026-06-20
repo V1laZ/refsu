@@ -5,7 +5,6 @@
     class="fixed inset-safe z-30 bg-slate-950 backdrop-blur-sm lg:hidden"
     :class="dragging ? '' : 'transition-opacity duration-300 ease-in-out'"
     :style="{ opacity: backdropOpacity }"
-    @click="isOpen = false"
   />
 
   <aside
@@ -23,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { useEventListener, useMediaQuery } from '@vueuse/core'
+import { useEventListener, useMediaQuery, onClickOutside } from '@vueuse/core'
 import { ref, computed } from 'vue'
 
 const props = withDefaults(defineProps<{
@@ -44,6 +43,10 @@ const BACKDROP_MAX = 0.7
 const panel = ref<HTMLElement | null>(null)
 const dragging = ref(false)
 const dragOffset = ref<number | null>(null)
+
+onClickOutside(panel, () => {
+  if (!isDesktop.value && isOpen.value) isOpen.value = false
+})
 
 let pending = false
 let activated = false

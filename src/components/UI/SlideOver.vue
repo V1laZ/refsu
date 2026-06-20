@@ -10,7 +10,6 @@
       <div
         class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300 ease-out"
         :class="shown ? 'opacity-100' : 'opacity-0'"
-        @click="close"
       />
 
       <!-- Panel -->
@@ -50,6 +49,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 import { useModalLayer } from '@/composables/useModalLayer'
 
 defineOptions({ inheritAttrs: false })
@@ -70,6 +70,8 @@ const shown = ref(false)
 let closeTimer: ReturnType<typeof setTimeout> | null = null
 
 const { zIndex } = useModalLayer(open, close)
+
+onClickOutside(panelEl, () => close())
 
 const widthClass = computed(() => ({
   sm: 'max-w-sm',

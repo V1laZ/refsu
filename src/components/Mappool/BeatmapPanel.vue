@@ -62,7 +62,7 @@
           <Icon
             name="alert"
             size="sm"
-            class="mt-0.5 flex-shrink-0 text-rose-300"
+            class="mt-0.5 shrink-0 text-rose-300"
           />
           <p class="text-sm text-rose-200">
             {{ fetchError }}
@@ -76,7 +76,7 @@
           <Icon
             name="check"
             size="sm"
-            class="flex-shrink-0 text-emerald-300"
+            class="shrink-0 text-emerald-300"
           />
           <p class="text-sm text-emerald-200">
             {{ addedNotice }}

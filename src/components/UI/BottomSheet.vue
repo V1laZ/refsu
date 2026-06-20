@@ -10,7 +10,6 @@
       <div
         class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300 ease-out"
         :class="shown ? 'opacity-100' : 'opacity-0'"
-        @click="close"
       />
 
       <!-- Sheet -->
@@ -60,6 +59,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 import { useModalLayer } from '@/composables/useModalLayer'
 
 defineOptions({ inheritAttrs: false })
@@ -82,6 +82,8 @@ let startY = 0
 let closeTimer: ReturnType<typeof setTimeout> | null = null
 
 const { zIndex } = useModalLayer(open, close)
+
+onClickOutside(sheetEl, () => close())
 
 const sheetStyle = computed(() => ({
   maxHeight: 'calc(100dvh - env(safe-area-inset-top) - var(--title-bar-h) - 1rem)',

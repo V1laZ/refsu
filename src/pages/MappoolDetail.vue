@@ -67,6 +67,7 @@
 
     <!-- Desktop add/edit slideover -->
     <SlideOver
+      v-if="isDesktop"
       v-model="panelOpen"
       class="hidden lg:block"
     >
@@ -82,6 +83,7 @@
 
     <!-- Mobile add/edit bottom sheet -->
     <BottomSheet
+      v-else
       v-model="panelOpen"
       class="lg:hidden"
       :autofocus="false"
@@ -120,6 +122,7 @@ import IconBtn from '@/components/UI/IconBtn.vue'
 import Icon from '@/components/UI/Icon.vue'
 import Btn from '@/components/UI/Btn.vue'
 import type { BeatmapEntry } from '@/types'
+import { useMediaQuery } from '@vueuse/core'
 
 const route = useRoute()
 const router = useRouter()
@@ -129,6 +132,8 @@ const beatmaps = ref<BeatmapEntry[]>([])
 const panelOpen = ref(false)
 const panelBeatmap = ref<BeatmapEntry | null>(null)
 const poolFormOpen = ref(false)
+
+const isDesktop = useMediaQuery('(min-width: 1024px)')
 
 const poolId = computed(() => Number(route.params.id))
 const pool = computed(() => mappools.value.find(p => p.id === poolId.value) ?? null)
@@ -153,7 +158,6 @@ onMounted(async () => {
   await refreshBeatmaps()
 })
 
-// Reuse the component when navigating between pools (desktop master-detail).
 watch(poolId, async () => {
   closePanel()
   await refreshBeatmaps()
