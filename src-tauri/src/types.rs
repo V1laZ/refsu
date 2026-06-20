@@ -18,7 +18,8 @@ pub struct Room {
     pub display_name: String,
     pub room_type: RoomType,
     pub messages: Vec<IrcMessage>,
-    pub unread_count: u32,
+    pub has_unread: bool,
+    pub mention_count: u32,
     pub lobby_state: Option<LobbyState>,
 }
 
@@ -42,7 +43,8 @@ impl Room {
             id: channel_name,
             room_type,
             messages: Vec::new(),
-            unread_count: 0,
+            has_unread: false,
+            mention_count: 0,
             lobby_state,
         }
     }
@@ -53,20 +55,25 @@ impl Room {
             display_name: username,
             room_type: RoomType::PrivateMessage,
             messages: Vec::new(),
-            unread_count: 0,
+            has_unread: false,
+            mention_count: 0,
             lobby_state: None,
         }
     }
 
-    pub fn add_message(&mut self, message: IrcMessage, is_active: bool) {
+    pub fn add_message(&mut self, message: IrcMessage, is_active: bool, is_mention: bool) {
         self.messages.push(message);
         if !is_active {
-            self.unread_count += 1;
+            self.has_unread = true;
+            if is_mention {
+                self.mention_count += 1;
+            }
         }
     }
 
     pub fn mark_as_read(&mut self) {
-        self.unread_count = 0;
+        self.has_unread = false;
+        self.mention_count = 0;
     }
 
     pub fn to_room_page(&self, limit: usize) -> RoomPage {
@@ -77,7 +84,8 @@ impl Room {
             display_name: self.display_name.clone(),
             room_type: self.room_type.clone(),
             messages: self.messages[start..].to_vec(),
-            unread_count: self.unread_count,
+            has_unread: self.has_unread,
+            mention_count: self.mention_count,
             lobby_state: self.lobby_state.clone(),
             has_more_messages: start > 0,
         }
@@ -109,7 +117,8 @@ pub struct RoomPage {
     pub display_name: String,
     pub room_type: RoomType,
     pub messages: Vec<IrcMessage>,
-    pub unread_count: u32,
+    pub has_unread: bool,
+    pub mention_count: u32,
     pub lobby_state: Option<LobbyState>,
     pub has_more_messages: bool,
 }
@@ -128,7 +137,8 @@ pub struct RoomListItem {
     pub id: String,
     pub display_name: String,
     pub room_type: RoomType,
-    pub unread_count: u32,
+    pub has_unread: bool,
+    pub mention_count: u32,
     pub match_status: Option<String>,
 }
 
@@ -138,7 +148,8 @@ impl From<&Room> for RoomListItem {
             id: room.id.clone(),
             display_name: room.display_name.clone(),
             room_type: room.room_type.clone(),
-            unread_count: room.unread_count,
+            has_unread: room.has_unread,
+            mention_count: room.mention_count,
             match_status: room
                 .lobby_state
                 .as_ref()

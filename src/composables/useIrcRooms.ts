@@ -65,7 +65,10 @@ export function useIrcRooms() {
       const room = await invoke<RoomUnion>('set_active_room', { roomId })
       activeRoom.value = room
       const item = roomsMap.value.get(roomId)
-      if (item) item.unreadCount = 0
+      if (item) {
+        item.hasUnread = false
+        item.mentionCount = 0
+      }
     }
     catch (error) {
       console.error('Failed to select room:', error)
@@ -112,7 +115,10 @@ export function useIrcRooms() {
 
       await listen<InactiveRoomUnreadUpdateEvent>('inactive-room-unread-updated', ({ payload }) => {
         const room = roomsMap.value.get(payload.roomId)
-        if (room) room.unreadCount = payload.unreadCount
+        if (room) {
+          room.hasUnread = payload.hasUnread
+          room.mentionCount = payload.mentionCount
+        }
       }),
 
       await listen<ActiveRoomLobbyStateUpdateEvent>('active-room-lobby-state-updated', ({ payload }) => {

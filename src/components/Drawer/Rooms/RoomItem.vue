@@ -26,11 +26,15 @@
           {{ room.displayName }}
         </span>
         <span
-          v-if="room.unreadCount > 0 && !isActive"
+          v-if="!isActive && room.mentionCount > 0"
           class="ml-auto shrink-0 rounded-full bg-pink-500/15 px-2 py-0.5 text-[10px] font-semibold text-pink-200 ring-1 ring-inset ring-pink-400/30"
         >
-          {{ room.unreadCount > 99 ? '99+' : room.unreadCount }}
+          {{ room.mentionCount > 99 ? '99+' : room.mentionCount }}
         </span>
+        <span
+          v-else-if="!isActive && room.hasUnread"
+          class="ml-auto size-2 shrink-0 rounded-full bg-pink-500/40"
+        />
       </button>
 
       <button

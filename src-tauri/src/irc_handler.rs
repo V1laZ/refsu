@@ -57,14 +57,14 @@ pub async fn handle_irc_connection(
                                 is_private: false,
                             };
 
-                            let (unread_count, is_active) = {
+                            let (has_unread, mention_count, is_active) = {
                                 let mut irc_state = state.lock().unwrap();
                                 let is_active = irc_state.active_room_id.as_ref() == Some(&room_id);
                                 if let Some(room) = irc_state.rooms.get_mut(&room_id) {
-                                    room.add_message(our_message.clone(), is_active);
-                                    (room.unread_count, is_active)
+                                    room.add_message(our_message.clone(), is_active, false);
+                                    (room.has_unread, room.mention_count, is_active)
                                 } else {
-                                    (0, false)
+                                    (false, 0, false)
                                 }
                             };
 
@@ -77,7 +77,8 @@ pub async fn handle_irc_connection(
                             } else {
                                 let _ = app_handle.emit("inactive-room-unread-updated", serde_json::json!({
                                     "roomId": room_id,
-                                    "unreadCount": unread_count
+                                    "hasUnread": has_unread,
+                                    "mentionCount": mention_count
                                 }));
                             }
                         }
@@ -105,14 +106,14 @@ pub async fn handle_irc_connection(
                                 is_private: true,
                             };
 
-                            let (unread_count, is_active) = {
+                            let (has_unread, mention_count, is_active) = {
                                 let mut irc_state = state.lock().unwrap();
                                 let is_active = irc_state.active_room_id.as_ref() == Some(&username);
                                 if let Some(room) = irc_state.rooms.get_mut(&username) {
-                                    room.add_message(our_message.clone(), is_active);
-                                    (room.unread_count, is_active)
+                                    room.add_message(our_message.clone(), is_active, false);
+                                    (room.has_unread, room.mention_count, is_active)
                                 } else {
-                                    (0, false)
+                                    (false, 0, false)
                                 }
                             };
 
@@ -125,7 +126,8 @@ pub async fn handle_irc_connection(
                             } else {
                                 let _ = app_handle.emit("inactive-room-unread-updated", serde_json::json!({
                                     "roomId": username,
-                                    "unreadCount": unread_count
+                                    "hasUnread": has_unread,
+                                    "mentionCount": mention_count
                                 }));
                             }
                         }
@@ -222,7 +224,21 @@ fn handle_incoming_message(
 
                 println!("[{}] <{}> {}", room_id, nick, text);
 
-                let (unread_count, is_active) = {
+                let is_own = nick.eq_ignore_ascii_case(&current_username);
+                let is_bot = nick.eq_ignore_ascii_case("BanchoBot");
+                let is_mention = if !is_own && !is_bot {
+                    let lower_text = text.to_lowercase();
+                    let username_mention = !current_username.is_empty()
+                        && lower_text.contains(&current_username.to_lowercase());
+                    let keyword_mention = mention_keywords
+                        .iter()
+                        .any(|keyword| contains_word(&lower_text, keyword));
+                    is_private || username_mention || keyword_mention
+                } else {
+                    false
+                };
+
+                let (has_unread, mention_count, is_active) = {
                     let mut irc_state = state.lock().unwrap();
 
                     // Create room if it doesn't exist (for incoming PMs)
@@ -235,10 +251,10 @@ fn handle_incoming_message(
 
                     // Add message to appropriate room
                     if let Some(room_obj) = irc_state.rooms.get_mut(&room_id) {
-                        room_obj.add_message(irc_message.clone(), is_active);
-                        (room_obj.unread_count, is_active)
+                        room_obj.add_message(irc_message.clone(), is_active, is_mention);
+                        (room_obj.has_unread, room_obj.mention_count, is_active)
                     } else {
-                        (0, false)
+                        (false, 0, false)
                     }
                 };
 
@@ -260,27 +276,14 @@ fn handle_incoming_message(
                         "inactive-room-unread-updated",
                         serde_json::json!({
                             "roomId": room_id,
-                            "unreadCount": unread_count
+                            "hasUnread": has_unread,
+                            "mentionCount": mention_count
                         }),
                     );
                 }
 
-                let is_own = nick.eq_ignore_ascii_case(&current_username);
-                let is_bot = nick.eq_ignore_ascii_case("BanchoBot");
-                if !is_own && !is_bot {
-                    let lower_text = text.to_lowercase();
-                    let is_mention = !current_username.is_empty()
-                        && lower_text.contains(&current_username.to_lowercase());
-                    let is_keyword = mention_keywords
-                        .iter()
-                        .any(|keyword| contains_word(&lower_text, keyword));
-                    if is_private || is_mention || is_keyword {
-                        emit_sound_notification(
-                            app_handle,
-                            SoundNotificationKind::Mention,
-                            &room_id,
-                        );
-                    }
+                if is_mention {
+                    emit_sound_notification(app_handle, SoundNotificationKind::Mention, &room_id);
                 }
             }
         }

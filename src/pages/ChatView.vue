@@ -140,7 +140,7 @@ const router = useRouter()
 const { roomsMap, activeRoom, roomsList, selectRoom, loadMoreMessages } = useIrcRooms()
 
 const hasUnreadInOtherRooms = computed(() =>
-  roomsList.value.some(room => room.id !== activeRoom.value?.id && room.unreadCount > 0),
+  roomsList.value.some(room => room.id !== activeRoom.value?.id && room.hasUnread),
 )
 
 const isOpenSelectMap = ref(false)

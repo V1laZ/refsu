@@ -11,7 +11,8 @@ export type RoomBase = {
   id: string
   displayName: string
   messages: IrcMessage[]
-  unreadCount: number
+  hasUnread: boolean
+  mentionCount: number
   hasMoreMessages: boolean
 }
 
@@ -66,7 +67,8 @@ export type ActiveRoomMessageEvent = {
 
 export type InactiveRoomUnreadUpdateEvent = {
   roomId: string
-  unreadCount: number
+  hasUnread: boolean
+  mentionCount: number
 }
 
 export type ActiveRoomLobbyStateUpdateEvent = {
