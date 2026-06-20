@@ -250,12 +250,13 @@ onMounted(async () => {
     const saved = await dbService.getCredentials()
     if (saved) {
       await connectWithCredentials(saved)
-      checkBatteryOptimization()
     }
     else {
       loading.value = false
       router.replace('/login')
     }
+
+    checkBatteryOptimization()
 
     setTimeout(() => {
       checkForUpdates()
