@@ -243,6 +243,7 @@ pub struct IrcClientState {
     pub client: Option<Arc<Mutex<irc::client::Client>>>,
     pub message_sender: Option<tokio::sync::mpsc::UnboundedSender<IrcCommand>>,
     pub current_username: Option<String>,
+    pub mention_keywords: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -264,6 +265,7 @@ impl Default for IrcClientState {
             client: None,
             message_sender: None,
             current_username: None,
+            mention_keywords: Vec::new(),
         }
     }
 }

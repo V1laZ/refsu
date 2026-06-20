@@ -1,7 +1,8 @@
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 pub fn get_migrations() -> Vec<Migration> {
-    vec![Migration {
+    vec![
+    Migration {
         version: 1,
         description: "create_initial_schema",
         sql: "
@@ -47,6 +48,19 @@ pub fn get_migrations() -> Vec<Migration> {
                 updated_at TEXT NOT NULL
             );
         ",
-        kind: MigrationKind::Up,
-    }]
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "create_mention_keywords",
+            sql: "
+            CREATE TABLE IF NOT EXISTS mention_keywords (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                word TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                created_at TEXT NOT NULL
+            );
+        ",
+            kind: MigrationKind::Up,
+        },
+    ]
 }

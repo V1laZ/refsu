@@ -188,9 +188,12 @@ fn handle_incoming_message(
 
                 let is_private = !room.starts_with("#");
 
-                let current_username = {
+                let (current_username, mention_keywords) = {
                     let irc_state = state.lock().unwrap();
-                    irc_state.current_username.clone().unwrap_or_default()
+                    (
+                        irc_state.current_username.clone().unwrap_or_default(),
+                        irc_state.mention_keywords.clone(),
+                    )
                 };
 
                 let room_id = if is_private {
@@ -265,11 +268,13 @@ fn handle_incoming_message(
                 let is_own = nick.eq_ignore_ascii_case(&current_username);
                 let is_bot = nick.eq_ignore_ascii_case("BanchoBot");
                 if !is_own && !is_bot {
+                    let lower_text = text.to_lowercase();
                     let is_mention = !current_username.is_empty()
-                        && text
-                            .to_lowercase()
-                            .contains(&current_username.to_lowercase());
-                    if is_private || is_mention {
+                        && lower_text.contains(&current_username.to_lowercase());
+                    let is_keyword = mention_keywords
+                        .iter()
+                        .any(|keyword| contains_word(&lower_text, keyword));
+                    if is_private || is_mention || is_keyword {
                         emit_sound_notification(
                             app_handle,
                             SoundNotificationKind::Mention,
@@ -526,4 +531,38 @@ fn handle_incoming_message(
             // println!("Other IRC command: {:?}", msg.command);
         }
     }
+}
+
+fn contains_word(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return false;
+    }
+
+    let mut search_start = 0;
+    while let Some(offset) = haystack[search_start..].find(needle) {
+        let start = search_start + offset;
+        let end = start + needle.len();
+
+        let before_ok = haystack[..start]
+            .chars()
+            .next_back()
+            .map(|c| !c.is_alphanumeric())
+            .unwrap_or(true);
+        let after_ok = haystack[end..]
+            .chars()
+            .next()
+            .map(|c| !c.is_alphanumeric())
+            .unwrap_or(true);
+
+        if before_ok && after_ok {
+            return true;
+        }
+
+        search_start = start + 1;
+        if search_start >= haystack.len() {
+            break;
+        }
+    }
+
+    false
 }

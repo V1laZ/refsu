@@ -265,6 +265,32 @@ class DatabaseService {
 
     await this.db.execute('DELETE FROM oauth_tokens WHERE irc_username = ?', [username])
   }
+
+  async getMentionKeywords(): Promise<string[]> {
+    if (!this.db) throw new Error('Database not initialized')
+
+    const rows = await this.db.select<{ word: string }[]>(
+      `SELECT word FROM mention_keywords ORDER BY created_at ASC, id ASC`,
+    )
+
+    return rows.map(row => row.word)
+  }
+
+  async addMentionKeyword(word: string): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized')
+
+    await this.db.execute(
+      `INSERT INTO mention_keywords (word, created_at) VALUES (?, ?)
+       ON CONFLICT(word) DO NOTHING`,
+      [word, new Date().toISOString()],
+    )
+  }
+
+  async deleteMentionKeyword(word: string): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized')
+
+    await this.db.execute('DELETE FROM mention_keywords WHERE word = ?', [word])
+  }
 }
 
 export const dbService = new DatabaseService()

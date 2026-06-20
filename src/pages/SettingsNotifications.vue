@@ -67,16 +67,86 @@
           </div>
         </div>
       </section>
+
+      <section>
+        <h3 class="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+          Trigger words
+        </h3>
+        <p class="mb-3 text-xs text-slate-500">
+          Play the mention sound whenever any of these words appears in chat.
+        </p>
+
+        <div class="rounded-lg border border-slate-800 bg-slate-800/50 p-4">
+          <form
+            class="flex items-center gap-2"
+            @submit.prevent="addWord"
+          >
+            <Input
+              ref="inputEl"
+              v-model="newWord"
+              placeholder="Add a word…"
+              :maxlength="50"
+            />
+            <Btn
+              type="submit"
+              :disabled="!newWord.trim()"
+            >
+              <template #icon>
+                <Icon
+                  name="plus"
+                  size="sm"
+                />
+              </template>
+              Add
+            </Btn>
+          </form>
+
+          <div
+            v-if="mentionKeywords.words.length"
+            class="mt-4 flex flex-wrap gap-2"
+          >
+            <span
+              v-for="word in mentionKeywords.words"
+              :key="word"
+              class="inline-flex items-center gap-1.5 rounded-full bg-slate-700/60 py-1 pl-3 pr-1.5 text-sm text-slate-200"
+            >
+              {{ word }}
+              <button
+                type="button"
+                class="flex size-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-600 hover:text-rose-300"
+                :title="`Remove ${word}`"
+                @click="removeMentionKeyword(word)"
+              >
+                <Icon
+                  name="close"
+                  size="xs"
+                />
+              </button>
+            </span>
+          </div>
+          <p
+            v-else
+            class="mt-4 text-sm text-slate-500"
+          >
+            No trigger words yet.
+          </p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import Switch from '@/components/UI/Switch.vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
+import Input from '@/components/UI/Input.vue'
+import Btn from '@/components/UI/Btn.vue'
+import Icon from '@/components/UI/Icon.vue'
 import { soundSettings, type SoundEvent } from '@/stores/settings'
 import { soundService, type SoundName } from '@/services/sound'
+import { mentionKeywords, addMentionKeyword, removeMentionKeyword } from '@/stores/mentionKeywords'
 
 const router = useRouter()
 
@@ -86,4 +156,13 @@ const soundEventOptions: { key: SoundEvent, sound: SoundName, label: string }[] 
   { key: 'matchFinish', sound: 'matchFinish', label: 'Match finished' },
   { key: 'allReady', sound: 'allReady', label: 'All players ready' },
 ]
+
+const newWord = ref('')
+const inputEl = useTemplateRef('inputEl')
+
+async function addWord() {
+  const added = await addMentionKeyword(newWord.value)
+  if (added) newWord.value = ''
+  inputEl.value?.focus()
+}
 </script>

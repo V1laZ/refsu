@@ -71,6 +71,7 @@ pub fn run() {
             leave_channel,
             close_private_message,
             get_connection_status,
+            set_mention_keywords,
             get_rooms_list,
             set_active_room,
             start_private_message,

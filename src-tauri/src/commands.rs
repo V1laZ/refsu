@@ -267,6 +267,20 @@ pub async fn get_connection_status(state: State<'_, IrcState>) -> Result<bool, S
 }
 
 #[tauri::command]
+pub async fn set_mention_keywords(
+    keywords: Vec<String>,
+    state: State<'_, IrcState>,
+) -> Result<(), String> {
+    let mut irc_state = state.lock().unwrap();
+    irc_state.mention_keywords = keywords
+        .into_iter()
+        .map(|k| k.trim().to_lowercase())
+        .filter(|k| !k.is_empty())
+        .collect();
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn get_rooms_list(state: State<'_, IrcState>) -> Result<RoomsListResponse, String> {
     let irc_state = state.lock().unwrap();
     Ok(RoomsListResponse {

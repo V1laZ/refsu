@@ -114,6 +114,7 @@ import { platform } from '@tauri-apps/plugin-os'
 import { useAndroidBackButton } from './composables/useAndroidBackButton'
 import { soundService } from './services/sound'
 import { useSoundNotifications } from './composables/useSoundNotifications'
+import { loadMentionKeywords } from './stores/mentionKeywords'
 
 const router = useRouter()
 const currentPlatform = platform()
@@ -244,6 +245,7 @@ onMounted(async () => {
     loadingMessage.value = 'Initializing...'
     errorMessage.value = ''
     await dbService.init()
+    await loadMentionKeywords()
     loadingMessage.value = 'Checking credentials...'
     const saved = await dbService.getCredentials()
     if (saved) {
