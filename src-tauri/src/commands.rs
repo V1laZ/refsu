@@ -281,6 +281,23 @@ pub async fn set_mention_keywords(
 }
 
 #[tauri::command]
+pub async fn set_app_focused(focused: bool, state: State<'_, IrcState>) -> Result<(), String> {
+    let mut irc_state = state.lock().unwrap();
+    irc_state.app_focused = focused;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn set_os_notifications_enabled(
+    enabled: bool,
+    state: State<'_, IrcState>,
+) -> Result<(), String> {
+    let mut irc_state = state.lock().unwrap();
+    irc_state.os_notifications_enabled = enabled;
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn get_rooms_list(state: State<'_, IrcState>) -> Result<RoomsListResponse, String> {
     let irc_state = state.lock().unwrap();
     Ok(RoomsListResponse {

@@ -17,6 +17,7 @@
     "core:window:allow-toggle-maximize",
     "core:window:allow-close",
     "core:window:allow-is-maximized",
+    "notification:default",
     {
       "identifier": "http:default",
       "allow": [

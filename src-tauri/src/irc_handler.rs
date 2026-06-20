@@ -190,11 +190,13 @@ fn handle_incoming_message(
 
                 let is_private = !room.starts_with("#");
 
-                let (current_username, mention_keywords) = {
+                let (current_username, mention_keywords, app_focused, os_notifications_enabled) = {
                     let irc_state = state.lock().unwrap();
                     (
                         irc_state.current_username.clone().unwrap_or_default(),
                         irc_state.mention_keywords.clone(),
+                        irc_state.app_focused,
+                        irc_state.os_notifications_enabled,
                     )
                 };
 
@@ -284,6 +286,15 @@ fn handle_incoming_message(
 
                 if is_mention {
                     emit_sound_notification(app_handle, SoundNotificationKind::Mention, &room_id);
+
+                    if os_notifications_enabled && !app_focused {
+                        let title = if is_private {
+                            nick.clone()
+                        } else {
+                            format!("{} in {}", nick, room_id)
+                        };
+                        show_mention_notification(app_handle, &title, &text);
+                    }
                 }
             }
         }
@@ -568,4 +579,18 @@ fn contains_word(haystack: &str, needle: &str) -> bool {
     }
 
     false
+}
+
+fn show_mention_notification(app_handle: &tauri::AppHandle, title: &str, body: &str) {
+    use tauri_plugin_notification::NotificationExt;
+
+    if let Err(e) = app_handle
+        .notification()
+        .builder()
+        .title(title)
+        .body(body)
+        .show()
+    {
+        println!("Failed to show notification: {}", e);
+    }
 }

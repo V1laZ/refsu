@@ -291,6 +291,27 @@ class DatabaseService {
 
     await this.db.execute('DELETE FROM mention_keywords WHERE word = ?', [word])
   }
+
+  async getSetting(key: string): Promise<string | null> {
+    if (!this.db) throw new Error('Database not initialized')
+
+    const rows = await this.db.select<{ value: string }[]>(
+      'SELECT value FROM settings WHERE key = ?',
+      [key],
+    )
+
+    return rows.length ? rows[0].value : null
+  }
+
+  async setSetting(key: string, value: string): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized')
+
+    await this.db.execute(
+      `INSERT INTO settings (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+      [key, value],
+    )
+  }
 }
 
 export const dbService = new DatabaseService()

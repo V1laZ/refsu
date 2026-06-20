@@ -1,4 +1,6 @@
 import { reactive, watch } from 'vue'
+import { invoke } from '@tauri-apps/api/core'
+import { dbService } from '@/services/database'
 
 export type SoundEvent = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
 
@@ -8,9 +10,14 @@ export type SoundSettings = {
   events: Record<SoundEvent, boolean>
 }
 
-const STORAGE_KEY = 'refsu.soundSettings'
+export type NotificationSettings = {
+  enabled: boolean
+}
 
-const defaults: SoundSettings = {
+const SOUND_KEY = 'sound'
+const NOTIFICATION_KEY = 'notification'
+
+const soundDefaults: SoundSettings = {
   enabled: true,
   volume: 0.6,
   events: {
@@ -21,33 +28,83 @@ const defaults: SoundSettings = {
   },
 }
 
-function load(): SoundSettings {
+const notificationDefaults: NotificationSettings = {
+  enabled: true,
+}
+
+export const soundSettings = reactive<SoundSettings>(structuredClone(soundDefaults))
+export const notificationSettings = reactive<NotificationSettings>(structuredClone(notificationDefaults))
+
+// Guards the persistence watchers so the initial DB load doesn't write straight
+// back to the DB.
+let loaded = false
+
+function applySound(parsed: Partial<SoundSettings>) {
+  soundSettings.enabled = parsed.enabled ?? soundDefaults.enabled
+  soundSettings.volume = typeof parsed.volume === 'number'
+    ? Math.min(1, Math.max(0, parsed.volume))
+    : soundDefaults.volume
+  soundSettings.events = { ...soundDefaults.events, ...parsed.events }
+}
+
+function applyNotification(parsed: Partial<NotificationSettings>) {
+  notificationSettings.enabled = parsed.enabled ?? notificationDefaults.enabled
+}
+
+async function readSetting<T>(key: string): Promise<Partial<T> | null> {
+  const stored = await dbService.getSetting(key)
+  if (!stored) return null
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return structuredClone(defaults)
-    const parsed = JSON.parse(raw) as Partial<SoundSettings>
-    return {
-      enabled: parsed.enabled ?? defaults.enabled,
-      volume: typeof parsed.volume === 'number' ? Math.min(1, Math.max(0, parsed.volume)) : defaults.volume,
-      events: { ...defaults.events, ...parsed.events },
-    }
+    return JSON.parse(stored) as Partial<T>
   }
   catch {
-    return structuredClone(defaults)
+    return null
   }
 }
 
-export const soundSettings = reactive<SoundSettings>(load())
+export async function loadSettings() {
+  try {
+    const sound = await readSetting<SoundSettings>(SOUND_KEY)
+    if (sound) applySound(sound)
+
+    const notification = await readSetting<NotificationSettings>(NOTIFICATION_KEY)
+    if (notification) applyNotification(notification)
+  }
+  catch (error) {
+    console.error('Failed to load settings:', error)
+  }
+  finally {
+    loaded = true
+  }
+
+  await syncNotificationSettingsToBackend()
+}
+
+export async function syncNotificationSettingsToBackend() {
+  try {
+    await invoke('set_os_notifications_enabled', { enabled: notificationSettings.enabled })
+  }
+  catch (error) {
+    console.error('Failed to sync notification settings to backend:', error)
+  }
+}
 
 watch(
   soundSettings,
   (value) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
-    }
-    catch (error) {
-      console.error('Failed to persist sound settings:', error)
-    }
+    if (!loaded) return
+    dbService.setSetting(SOUND_KEY, JSON.stringify(value))
+      .catch(error => console.error('Failed to persist sound settings:', error))
   },
   { deep: true },
+)
+
+watch(
+  () => notificationSettings.enabled,
+  () => {
+    if (!loaded) return
+    dbService.setSetting(NOTIFICATION_KEY, JSON.stringify(notificationSettings))
+      .catch(error => console.error('Failed to persist notification settings:', error))
+    syncNotificationSettingsToBackend()
+  },
 )

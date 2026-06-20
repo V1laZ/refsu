@@ -53,6 +53,7 @@ pub fn run() {
     }
 
     builder
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(
@@ -72,6 +73,8 @@ pub fn run() {
             close_private_message,
             get_connection_status,
             set_mention_keywords,
+            set_app_focused,
+            set_os_notifications_enabled,
             get_rooms_list,
             set_active_room,
             start_private_message,

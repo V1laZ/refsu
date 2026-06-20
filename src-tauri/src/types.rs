@@ -255,6 +255,8 @@ pub struct IrcClientState {
     pub message_sender: Option<tokio::sync::mpsc::UnboundedSender<IrcCommand>>,
     pub current_username: Option<String>,
     pub mention_keywords: Vec<String>,
+    pub app_focused: bool,
+    pub os_notifications_enabled: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -277,6 +279,8 @@ impl Default for IrcClientState {
             message_sender: None,
             current_username: None,
             mention_keywords: Vec::new(),
+            app_focused: true,
+            os_notifications_enabled: true,
         }
     }
 }

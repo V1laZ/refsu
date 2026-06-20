@@ -114,7 +114,9 @@ import { platform } from '@tauri-apps/plugin-os'
 import { useAndroidBackButton } from './composables/useAndroidBackButton'
 import { soundService } from './services/sound'
 import { useSoundNotifications } from './composables/useSoundNotifications'
+import { useOsNotifications } from './composables/useOsNotifications'
 import { loadMentionKeywords } from './stores/mentionKeywords'
+import { loadSettings } from './stores/settings'
 
 const router = useRouter()
 const currentPlatform = platform()
@@ -122,6 +124,7 @@ const showTitleBar = currentPlatform !== 'ios' && currentPlatform !== 'android'
 
 useAndroidBackButton()
 useSoundNotifications()
+useOsNotifications()
 
 if (typeof document !== 'undefined') {
   document.documentElement.style.setProperty('--title-bar-h', showTitleBar ? '2rem' : '0px')
@@ -246,6 +249,7 @@ onMounted(async () => {
     errorMessage.value = ''
     await dbService.init()
     await loadMentionKeywords()
+    await loadSettings()
     loadingMessage.value = 'Checking credentials...'
     const saved = await dbService.getCredentials()
     if (saved) {
