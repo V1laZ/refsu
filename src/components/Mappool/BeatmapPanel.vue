@@ -229,7 +229,9 @@ const addedNotice = ref('')
 const isEdit = computed(() => !!props.beatmap)
 
 const computedMods = computed(() => {
-  if (selectedMods.value.includes('FM')) return ['FM']
+  if (selectedMods.value.includes('FM')) {
+    return selectedMods.value.filter(m => ['FM', 'DT', 'HT'].includes(m))
+  }
   return selectedMods.value
 })
 
@@ -336,6 +338,9 @@ const handleModSelect = (mod: string) => {
   selectedMods.value.push(mod)
 
   switch (mod) {
+    case 'FM':
+      selectedMods.value = selectedMods.value.filter(m => ['FM', 'DT', 'HT'].includes(m))
+      break
     case 'DT':
       selectedMods.value = selectedMods.value.filter(m => m !== 'HT')
       break
@@ -343,11 +348,13 @@ const handleModSelect = (mod: string) => {
       selectedMods.value = selectedMods.value.filter(m => m !== 'DT')
       break
     case 'HR':
-      selectedMods.value = selectedMods.value.filter(m => m !== 'EZ')
+      selectedMods.value = selectedMods.value.filter(m => m !== 'EZ' && m !== 'FM')
       break
     case 'EZ':
-      selectedMods.value = selectedMods.value.filter(m => m !== 'HR')
+      selectedMods.value = selectedMods.value.filter(m => m !== 'HR' && m !== 'FM')
       break
+    default:
+      selectedMods.value = selectedMods.value.filter(m => m !== 'FM')
   }
 }
 
