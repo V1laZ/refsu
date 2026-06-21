@@ -6,23 +6,25 @@
     }"
   >
     <div class="flex items-start gap-3">
-      <button
-        v-if="!isContinuation"
-        class="mt-0.5 shrink-0 rounded-full"
-        :class="message.username !== 'BanchoBot' ? 'cursor-pointer' : 'cursor-default'"
-        :disabled="message.username === 'BanchoBot'"
-        @click="handleUsernameClick"
-      >
-        <Avatar
-          :username="message.username"
-          size="sm"
-        />
-      </button>
+      <template v-if="!appearanceSettings.compactMode">
+        <button
+          v-if="!isContinuation"
+          class="mt-0.5 shrink-0 rounded-full"
+          :class="message.username !== 'BanchoBot' ? 'cursor-pointer' : 'cursor-default'"
+          :disabled="message.username === 'BanchoBot'"
+          @click="handleUsernameClick"
+        >
+          <Avatar
+            :username="message.username"
+            size="sm"
+          />
+        </button>
 
-      <div
-        v-else
-        class="w-8 select-none"
-      />
+        <div
+          v-else
+          class="w-8 select-none"
+        />
+      </template>
 
       <div class="min-w-0 flex-1">
         <div
@@ -128,6 +130,7 @@ import { computed, ref } from 'vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { globalState } from '@/stores/global'
 import { parseNowPlaying, type NowPlaying } from '@/utils/nowPlaying'
+import { appearanceSettings } from '@/stores/settings'
 import Avatar from '@/components/UI/Avatar.vue'
 import Icon from '@/components/UI/Icon.vue'
 import Mod from '@/components/Mod.vue'

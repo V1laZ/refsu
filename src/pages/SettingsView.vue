@@ -86,6 +86,7 @@ const router = useRouter()
 const groups: { path: string, label: string, icon: IconName }[] = [
   { path: '/settings/profile', label: 'Profile', icon: 'user' },
   { path: '/settings/notifications', label: 'Notifications', icon: 'bell' },
+  { path: '/settings/appearance', label: 'Appearance', icon: 'paintbrush' },
 ]
 
 const hasDetail = computed(() => route.matched.length > 1)

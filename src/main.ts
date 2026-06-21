@@ -11,6 +11,7 @@ import MappoolDetail from './pages/MappoolDetail.vue'
 import SettingsView from './pages/SettingsView.vue'
 import SettingsProfile from './pages/SettingsProfile.vue'
 import SettingsNotifications from './pages/SettingsNotifications.vue'
+import SettingsAppearance from './pages/SettingsAppearance.vue'
 export const avatarCache = new Map<string, string>()
 
 declare module 'vue-router' {
@@ -38,6 +39,7 @@ const routes = [
     children: [
       { path: 'profile', component: SettingsProfile },
       { path: 'notifications', component: SettingsNotifications },
+      { path: 'appearance', component: SettingsAppearance },
     ],
   },
 ]

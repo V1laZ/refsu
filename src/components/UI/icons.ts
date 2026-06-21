@@ -30,6 +30,7 @@ export const ICONS = {
   drag: { viewBox: '0 0 24 24', fill: 'currentColor', stroke: 'none', strokeWidth: 0, body: '<circle cx="9" cy="5" r="1.6" /><circle cx="15" cy="5" r="1.6" /><circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="9" cy="19" r="1.6" /><circle cx="15" cy="19" r="1.6" />' },
   bell: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />' },
   ban: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<circle cx="12" cy="12" r="9" /><path d="M5.64 5.64l12.72 12.72" />' },
+  paintbrush: { viewBox: '0 0 24 24', fill: 'currentColor', stroke: 'none', strokeWidth: 0, body: '<path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.996.996 0 0 0-1.41 0L9 12l3.75 3.75 7.96-7.96c.39-.39.39-1.02 0-1.41z" />' },
 } as const
 
 export type IconName = keyof typeof ICONS

@@ -18,9 +18,14 @@ export type PickPredictionSettings = {
   enabled: boolean
 }
 
+export type AppearanceSettings = {
+  compactMode: boolean
+}
+
 const SOUND_KEY = 'sound'
 const NOTIFICATION_KEY = 'notification'
 const PICK_PREDICTION_KEY = 'pickPrediction'
+const APPEARANCE_KEY = 'appearance'
 
 const soundDefaults: SoundSettings = {
   enabled: true,
@@ -42,9 +47,14 @@ const pickPredictionDefaults: PickPredictionSettings = {
   enabled: true,
 }
 
+const appearanceDefaults: AppearanceSettings = {
+  compactMode: false,
+}
+
 export const soundSettings = reactive<SoundSettings>(structuredClone(soundDefaults))
 export const notificationSettings = reactive<NotificationSettings>(structuredClone(notificationDefaults))
 export const pickPredictionSettings = reactive<PickPredictionSettings>(structuredClone(pickPredictionDefaults))
+export const appearanceSettings = reactive<AppearanceSettings>(structuredClone(appearanceDefaults))
 
 // Guards the persistence watchers so the initial DB load doesn't write straight
 // back to the DB.
@@ -64,6 +74,10 @@ function applyNotification(parsed: Partial<NotificationSettings>) {
 
 function applyPickPrediction(parsed: Partial<PickPredictionSettings>) {
   pickPredictionSettings.enabled = parsed.enabled ?? pickPredictionDefaults.enabled
+}
+
+function applyAppearance(parsed: Partial<AppearanceSettings>) {
+  appearanceSettings.compactMode = parsed.compactMode ?? appearanceDefaults.compactMode
 }
 
 async function readSetting<T>(key: string): Promise<Partial<T> | null> {
@@ -87,6 +101,9 @@ export async function loadSettings() {
 
     const pickPrediction = await readSetting<PickPredictionSettings>(PICK_PREDICTION_KEY)
     if (pickPrediction) applyPickPrediction(pickPrediction)
+
+    const appearance = await readSetting<AppearanceSettings>(APPEARANCE_KEY)
+    if (appearance) applyAppearance(appearance)
   }
   catch (error) {
     console.error('Failed to load settings:', error)
@@ -133,5 +150,14 @@ watch(
     if (!loaded) return
     dbService.setSetting(PICK_PREDICTION_KEY, JSON.stringify(pickPredictionSettings))
       .catch(error => console.error('Failed to persist pick prediction settings:', error))
+  },
+)
+
+watch(
+  () => appearanceSettings.compactMode,
+  () => {
+    if (!loaded) return
+    dbService.setSetting(APPEARANCE_KEY, JSON.stringify(appearanceSettings))
+      .catch(error => console.error('Failed to persist appearance settings:', error))
   },
 )
