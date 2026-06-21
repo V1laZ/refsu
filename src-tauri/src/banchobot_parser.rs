@@ -456,6 +456,7 @@ impl BanchoBotParser {
         // Countdown finished or aborted
         if text == "Countdown finished" || text == "Countdown aborted" {
             Self::update_timer(channel, None, state, app_handle);
+            emit_sound_notification(app_handle, SoundNotificationKind::TimerEnd, channel);
             return true;
         }
 

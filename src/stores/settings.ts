@@ -2,7 +2,7 @@ import { reactive, watch } from 'vue'
 import { invoke } from '@tauri-apps/api/core'
 import { dbService } from '@/services/database'
 
-export type SoundEvent = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
+export type SoundEvent = 'mention' | 'matchStart' | 'matchFinish' | 'allReady' | 'timerEnd'
 
 export type SoundSettings = {
   enabled: boolean
@@ -25,6 +25,7 @@ const soundDefaults: SoundSettings = {
     matchStart: true,
     matchFinish: true,
     allReady: true,
+    timerEnd: true,
   },
 }
 

@@ -3,14 +3,16 @@ import mentionUrl from '@/assets/sounds/mention.wav'
 import matchStartUrl from '@/assets/sounds/match-start.wav'
 import matchFinishUrl from '@/assets/sounds/match-finish.wav'
 import allReadyUrl from '@/assets/sounds/all-ready.wav'
+import timerEndUrl from '@/assets/sounds/timer-end.wav'
 
-export type SoundName = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
+export type SoundName = 'mention' | 'matchStart' | 'matchFinish' | 'allReady' | 'timerEnd'
 
 const SOUND_URLS: Record<SoundName, string> = {
   mention: mentionUrl,
   matchStart: matchStartUrl,
   matchFinish: matchFinishUrl,
   allReady: allReadyUrl,
+  timerEnd: timerEndUrl,
 }
 
 // Minimum gap between two plays of the same sound

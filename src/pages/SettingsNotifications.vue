@@ -172,6 +172,7 @@ const soundEventOptions: { key: SoundEvent, sound: SoundName, label: string }[] 
   { key: 'matchStart', sound: 'matchStart', label: 'Match started' },
   { key: 'matchFinish', sound: 'matchFinish', label: 'Match finished' },
   { key: 'allReady', sound: 'allReady', label: 'All players ready' },
+  { key: 'timerEnd', sound: 'timerEnd', label: 'Timer ended' },
 ]
 
 const newWord = ref('')

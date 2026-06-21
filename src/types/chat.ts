@@ -85,7 +85,7 @@ export type RoomMatchStatusUpdateEvent = {
   matchStatus: LobbyState['matchStatus']
 }
 
-export type SoundNotificationType = 'mention' | 'matchStart' | 'matchFinish' | 'allReady'
+export type SoundNotificationType = 'mention' | 'matchStart' | 'matchFinish' | 'allReady' | 'timerEnd'
 
 export type SoundNotificationEvent = {
   type: SoundNotificationType

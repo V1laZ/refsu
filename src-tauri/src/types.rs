@@ -302,6 +302,7 @@ pub enum SoundNotificationKind {
     MatchStart,
     MatchFinish,
     AllReady,
+    TimerEnd,
 }
 
 #[derive(Debug, Serialize, Clone)]
