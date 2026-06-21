@@ -20,14 +20,12 @@
       </p>
     </div>
 
-    <div
-      v-else
-      class="space-y-0.5"
-    >
+    <div v-else>
       <Message
-        v-for="(message, index) in messages"
-        :key="`${message.timestamp}${index}`"
-        :message="message"
+        v-for="(item, index) in clusteredMessages"
+        :key="`${item.message.timestamp}${index}`"
+        :message="item.message"
+        :is-continuation="item.isContinuation"
         @click-username="emit('clickUsername', $event)"
         @click-beatmap="emit('clickBeatmap', $event)"
       />
@@ -59,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUpdated, nextTick, onUnmounted, watch, useTemplateRef } from 'vue'
+import { ref, computed, onMounted, onUpdated, nextTick, onUnmounted, watch, useTemplateRef } from 'vue'
 import Message from './Message.vue'
 import Icon from '@/components/UI/Icon.vue'
 import type { IrcMessage } from '@/types'
@@ -77,6 +75,19 @@ const emit = defineEmits<{
   clickBeatmap: [nowPlaying: NowPlaying]
   loadMore: []
 }>()
+
+const CLUSTER_WINDOW_SECONDS = 60
+
+const clusteredMessages = computed(() =>
+  props.messages.map((message, index) => {
+    const prev = props.messages[index - 1]
+    const isContinuation
+      = !!prev
+        && prev.username === message.username
+        && message.timestamp - prev.timestamp <= CLUSTER_WINDOW_SECONDS
+    return { message, isContinuation }
+  }),
+)
 
 const messagesContainer = useTemplateRef('messagesContainer')
 const isAtBottom = ref(true)

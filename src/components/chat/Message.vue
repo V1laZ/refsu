@@ -1,8 +1,14 @@
 <template>
-  <div class="group rounded-lg px-3 py-1.5 transition-colors hover:bg-slate-800/50">
+  <div
+    class="group rounded-lg px-3 hover:bg-slate-800/50 py-0.5"
+    :class="{
+      'mt-2': !isContinuation,
+    }"
+  >
     <div class="flex items-start gap-3">
       <button
-        class="mt-0.5 flex-shrink-0 rounded-full"
+        v-if="!isContinuation"
+        class="mt-0.5 shrink-0 rounded-full"
         :class="message.username !== 'BanchoBot' ? 'cursor-pointer' : 'cursor-default'"
         :disabled="message.username === 'BanchoBot'"
         @click="handleUsernameClick"
@@ -13,8 +19,16 @@
         />
       </button>
 
+      <div
+        v-else
+        class="w-8 select-none"
+      />
+
       <div class="min-w-0 flex-1">
-        <div class="flex items-baseline gap-2">
+        <div
+          v-if="!isContinuation"
+          class="flex items-baseline gap-2"
+        >
           <button
             class="font-semibold text-slate-100"
             :class="message.username !== 'BanchoBot' ? 'hover:text-pink-200 hover:underline cursor-pointer' : ''"
@@ -58,7 +72,7 @@
         <template v-else>
           <p
             v-if="textSegments.length"
-            class="mt-0.5 wrap-break-word text-sm text-slate-200"
+            class="wrap-break-word text-sm text-slate-200"
           >
             <template
               v-for="(segment, index) in textSegments"
@@ -118,9 +132,12 @@ import Avatar from '@/components/UI/Avatar.vue'
 import Icon from '@/components/UI/Icon.vue'
 import Mod from '@/components/Mod.vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   message: IrcMessage
-}>()
+  isContinuation?: boolean
+}>(), {
+  isContinuation: false,
+})
 
 const emit = defineEmits<{
   clickUsername: [username: string]
