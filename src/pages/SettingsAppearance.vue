@@ -28,6 +28,16 @@
             </div>
             <Switch v-model="appearanceSettings.compactMode" />
           </div>
+
+          <div class="mt-4 flex items-center justify-between gap-4 border-t border-slate-700/60 pt-4">
+            <div class="min-w-0">
+              <span class="text-sm font-medium text-slate-100">Team colors</span>
+              <p class="mt-0.5 text-xs text-slate-500">
+                Color player usernames red or blue based on their team in the lobby.
+              </p>
+            </div>
+            <Switch v-model="appearanceSettings.teamColors" />
+          </div>
         </div>
       </section>
     </div>

@@ -32,8 +32,8 @@
           class="flex items-baseline gap-2"
         >
           <button
-            class="font-semibold text-slate-100"
-            :class="message.username !== 'BanchoBot' ? 'hover:text-pink-200 hover:underline cursor-pointer' : ''"
+            class="font-semibold"
+            :class="usernameClass"
             @click="handleUsernameClick"
           >
             {{ message.username }}
@@ -138,8 +138,10 @@ import Mod from '@/components/Mod.vue'
 const props = withDefaults(defineProps<{
   message: IrcMessage
   isContinuation?: boolean
+  team?: 'red' | 'blue' | null
 }>(), {
   isContinuation: false,
+  team: null,
 })
 
 const emit = defineEmits<{
@@ -148,6 +150,19 @@ const emit = defineEmits<{
 }>()
 
 const nowPlaying = computed(() => parseNowPlaying(props.message.message))
+
+const usernameClass = computed(() => {
+  let base = 'text-slate-100'
+  let hover = 'hover:text-pink-200'
+
+  if (appearanceSettings.teamColors && props.team) {
+    base = props.team === 'red' ? 'text-rose-300' : 'text-sky-300'
+    hover = props.team === 'red' ? 'hover:text-rose-200' : 'hover:text-sky-200'
+  }
+
+  if (props.message.username === 'BanchoBot') return base
+  return `${base} ${hover} hover:underline cursor-pointer`
+})
 
 const formattedTime = computed(() => {
   return new Date(props.message.timestamp * 1000).toLocaleTimeString([], {

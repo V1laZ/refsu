@@ -75,6 +75,7 @@
         :messages="activeRoom.messages"
         :active-channel-id="activeRoom.id"
         :has-more-messages="activeRoom.hasMoreMessages"
+        :player-teams="playerTeams"
         class="grow"
         @click-username="handleClickUsername"
         @click-beatmap="handleClickBeatmap"
@@ -178,6 +179,16 @@ const { prediction: pickPrediction, dismiss: dismissPrediction } = usePickPredic
 const hasUnreadInOtherRooms = computed(() =>
   roomsList.value.some(room => room.id !== activeRoom.value?.id && room.hasUnread),
 )
+
+const playerTeams = computed<Record<string, 'red' | 'blue'>>(() => {
+  const room = activeRoom.value
+  if (room?.roomType !== 'MultiplayerLobby') return {}
+  const teams: Record<string, 'red' | 'blue'> = {}
+  for (const slot of room.lobbyState.slots) {
+    if (slot.player?.team) teams[slot.player.username] = slot.player.team
+  }
+  return teams
+})
 
 const isOpenSelectMap = ref(false)
 const leftDrawerOpen = ref(false)

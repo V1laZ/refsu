@@ -20,6 +20,7 @@ export type PickPredictionSettings = {
 
 export type AppearanceSettings = {
   compactMode: boolean
+  teamColors: boolean
 }
 
 const SOUND_KEY = 'sound'
@@ -49,6 +50,7 @@ const pickPredictionDefaults: PickPredictionSettings = {
 
 const appearanceDefaults: AppearanceSettings = {
   compactMode: false,
+  teamColors: true,
 }
 
 export const soundSettings = reactive<SoundSettings>(structuredClone(soundDefaults))
@@ -78,6 +80,7 @@ function applyPickPrediction(parsed: Partial<PickPredictionSettings>) {
 
 function applyAppearance(parsed: Partial<AppearanceSettings>) {
   appearanceSettings.compactMode = parsed.compactMode ?? appearanceDefaults.compactMode
+  appearanceSettings.teamColors = parsed.teamColors ?? appearanceDefaults.teamColors
 }
 
 async function readSetting<T>(key: string): Promise<Partial<T> | null> {
@@ -154,10 +157,11 @@ watch(
 )
 
 watch(
-  () => appearanceSettings.compactMode,
+  appearanceSettings,
   () => {
     if (!loaded) return
     dbService.setSetting(APPEARANCE_KEY, JSON.stringify(appearanceSettings))
       .catch(error => console.error('Failed to persist appearance settings:', error))
   },
+  { deep: true },
 )

@@ -26,6 +26,7 @@
         :key="`${item.message.timestamp}${index}`"
         :message="item.message"
         :is-continuation="item.isContinuation"
+        :team="playerTeams[item.message.username] ?? null"
         @click-username="emit('clickUsername', $event)"
         @click-beatmap="emit('clickBeatmap', $event)"
       />
@@ -64,11 +65,14 @@ import type { IrcMessage } from '@/types'
 import type { NowPlaying } from '@/utils/nowPlaying'
 import { useElementBounding } from '@vueuse/core'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   messages: IrcMessage[]
   activeChannelId: string
   hasMoreMessages: boolean
-}>()
+  playerTeams?: Record<string, 'red' | 'blue'>
+}>(), {
+  playerTeams: () => ({}),
+})
 
 const emit = defineEmits<{
   clickUsername: [username: string]
