@@ -1,6 +1,6 @@
 [package]
 name = "refsu"
-version = "1.0.0"
+version = "1.1.0"
 description = "Bancho IRC client for osu! referees"
 authors = ["V1laZ"]
 edition = "2021"
