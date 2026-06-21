@@ -14,8 +14,13 @@ export type NotificationSettings = {
   enabled: boolean
 }
 
+export type PickPredictionSettings = {
+  enabled: boolean
+}
+
 const SOUND_KEY = 'sound'
 const NOTIFICATION_KEY = 'notification'
+const PICK_PREDICTION_KEY = 'pickPrediction'
 
 const soundDefaults: SoundSettings = {
   enabled: true,
@@ -33,8 +38,13 @@ const notificationDefaults: NotificationSettings = {
   enabled: true,
 }
 
+const pickPredictionDefaults: PickPredictionSettings = {
+  enabled: true,
+}
+
 export const soundSettings = reactive<SoundSettings>(structuredClone(soundDefaults))
 export const notificationSettings = reactive<NotificationSettings>(structuredClone(notificationDefaults))
+export const pickPredictionSettings = reactive<PickPredictionSettings>(structuredClone(pickPredictionDefaults))
 
 // Guards the persistence watchers so the initial DB load doesn't write straight
 // back to the DB.
@@ -50,6 +60,10 @@ function applySound(parsed: Partial<SoundSettings>) {
 
 function applyNotification(parsed: Partial<NotificationSettings>) {
   notificationSettings.enabled = parsed.enabled ?? notificationDefaults.enabled
+}
+
+function applyPickPrediction(parsed: Partial<PickPredictionSettings>) {
+  pickPredictionSettings.enabled = parsed.enabled ?? pickPredictionDefaults.enabled
 }
 
 async function readSetting<T>(key: string): Promise<Partial<T> | null> {
@@ -70,6 +84,9 @@ export async function loadSettings() {
 
     const notification = await readSetting<NotificationSettings>(NOTIFICATION_KEY)
     if (notification) applyNotification(notification)
+
+    const pickPrediction = await readSetting<PickPredictionSettings>(PICK_PREDICTION_KEY)
+    if (pickPrediction) applyPickPrediction(pickPrediction)
   }
   catch (error) {
     console.error('Failed to load settings:', error)
@@ -107,5 +124,14 @@ watch(
     dbService.setSetting(NOTIFICATION_KEY, JSON.stringify(notificationSettings))
       .catch(error => console.error('Failed to persist notification settings:', error))
     syncNotificationSettingsToBackend()
+  },
+)
+
+watch(
+  () => pickPredictionSettings.enabled,
+  () => {
+    if (!loaded) return
+    dbService.setSetting(PICK_PREDICTION_KEY, JSON.stringify(pickPredictionSettings))
+      .catch(error => console.error('Failed to persist pick prediction settings:', error))
   },
 )

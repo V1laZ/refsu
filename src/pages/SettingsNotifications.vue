@@ -16,23 +16,6 @@
     <div class="mx-auto w-full max-w-2xl space-y-6 p-4 sm:p-6">
       <section>
         <h3 class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
-          System notifications
-        </h3>
-        <div class="rounded-lg border border-slate-800 bg-slate-800/50 p-4">
-          <div class="flex items-center justify-between gap-4">
-            <div class="min-w-0">
-              <span class="text-sm font-medium text-slate-100">Show notifications</span>
-              <p class="mt-0.5 text-xs text-slate-500">
-                Notify me about mentions and PMs while the app is in the background.
-              </p>
-            </div>
-            <Switch v-model="notificationSettings.enabled" />
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h3 class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
           Sounds
         </h3>
         <div class="rounded-lg border border-slate-800 bg-slate-800/50 p-4">
@@ -81,6 +64,40 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+          System notifications
+        </h3>
+        <div class="rounded-lg border border-slate-800 bg-slate-800/50 p-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="min-w-0">
+              <span class="text-sm font-medium text-slate-100">Show notifications</span>
+              <p class="mt-0.5 text-xs text-slate-500">
+                Notify me about mentions and PMs while the app is in the background.
+              </p>
+            </div>
+            <Switch v-model="notificationSettings.enabled" />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-500">
+          Pick predictions
+        </h3>
+        <div class="rounded-lg border border-slate-800 bg-slate-800/50 p-4">
+          <div class="flex items-center justify-between gap-4">
+            <div class="min-w-0">
+              <span class="text-sm font-medium text-slate-100">Suggest picks from chat</span>
+              <p class="mt-0.5 text-xs text-slate-500">
+                When a player names a mappool slot (e.g. NM1) in a lobby, show a quick pick/ban prompt.
+              </p>
+            </div>
+            <Switch v-model="pickPredictionSettings.enabled" />
           </div>
         </div>
       </section>
@@ -161,7 +178,7 @@ import IconBtn from '@/components/UI/IconBtn.vue'
 import Input from '@/components/UI/Input.vue'
 import Btn from '@/components/UI/Btn.vue'
 import Icon from '@/components/UI/Icon.vue'
-import { soundSettings, notificationSettings, type SoundEvent } from '@/stores/settings'
+import { soundSettings, notificationSettings, pickPredictionSettings, type SoundEvent } from '@/stores/settings'
 import { soundService, type SoundName } from '@/services/sound'
 import { mentionKeywords, addMentionKeyword, removeMentionKeyword } from '@/stores/mentionKeywords'
 

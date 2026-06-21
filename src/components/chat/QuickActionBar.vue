@@ -1,5 +1,5 @@
 <template>
-  <div class="border-b border-slate-800 bg-slate-900/60 px-3 py-2.5">
+  <div class="border-b border-slate-800 bg-[#0a1023] px-3 py-2.5">
     <div class="flex items-center justify-between gap-3">
       <div class="flex min-w-0 items-center gap-2">
         <StatusDot

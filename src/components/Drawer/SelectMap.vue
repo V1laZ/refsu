@@ -106,10 +106,10 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
-import { useSessionStorage } from '@vueuse/core'
 import { invoke } from '@tauri-apps/api/core'
 import List from '@/components/Mappool/Beatmap/List.vue'
 import { dbService } from '@/services/database'
+import { getBannedIds, toggleBan as toggleMapBan, clearBans as clearMapBans, isBanned } from '@/stores/mapBans'
 import type { LobbyState, BeatmapEntry, Mappool } from '@/types'
 import IconBtn from '@/components/UI/IconBtn.vue'
 import Icon from '@/components/UI/Icon.vue'
@@ -132,7 +132,8 @@ const mappools = ref<Mappool[]>([])
 const selectedMappoolId = ref<number | null>(null)
 const beatmaps = ref<BeatmapEntry[]>([])
 const isChangingMappool = ref(false)
-const bannedIds = useSessionStorage<number[]>(`bans:${props.roomId}`, [])
+
+const bannedIds = computed(() => getBannedIds(props.roomId))
 
 const currentMappoolName = computed(() => {
   const current = mappools.value.find(pool => pool.id === props.lobbyState.currentMappoolId)
@@ -170,17 +171,15 @@ const fetchBeatmaps = async (mappoolId: number) => {
 }
 
 const toggleBan = (beatmap: BeatmapEntry) => {
-  bannedIds.value = bannedIds.value.includes(beatmap.id)
-    ? bannedIds.value.filter(id => id !== beatmap.id)
-    : [...bannedIds.value, beatmap.id]
+  toggleMapBan(props.roomId, beatmap.id)
 }
 
 const clearBans = () => {
-  bannedIds.value = []
+  clearMapBans(props.roomId)
 }
 
 const selectBeatmap = (beatmap: BeatmapEntry) => {
-  if (bannedIds.value.includes(beatmap.id)) return
+  if (isBanned(props.roomId, beatmap.id)) return
   emit('selectBeatmap', beatmap)
 }
 

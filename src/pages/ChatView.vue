@@ -14,34 +14,47 @@
 
     <!-- Main Chat Area -->
     <div class="relative grow flex flex-col min-w-0">
-      <SelectMap
-        v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
-        :key="activeRoom.id"
-        :is-open="isOpenSelectMap"
-        :lobby-state="activeRoom.lobbyState"
-        :room-id="activeRoom.id"
-        @close="isOpenSelectMap = false"
-        @set-mappool="activeRoom.lobbyState.currentMappoolId = $event"
-        @select-beatmap="selectMap"
-      />
+      <div
+        ref="headerWrapper"
+        class="z-10"
+      >
+        <ChatHeader
+          :active-channel="activeRoom"
+          :has-unread="hasUnreadInOtherRooms"
+          @toggle-left-drawer="leftDrawerOpen = !leftDrawerOpen"
+          @toggle-right-drawer="rightDrawerOpen = !rightDrawerOpen"
+          @open-settings="router.push('/settings')"
+          @open-mappools="router.push('/mappools')"
+          @refresh="refreshLobbyState"
+        />
 
-      <ChatHeader
-        :active-channel="activeRoom"
-        :has-unread="hasUnreadInOtherRooms"
-        @toggle-left-drawer="leftDrawerOpen = !leftDrawerOpen"
-        @toggle-right-drawer="rightDrawerOpen = !rightDrawerOpen"
-        @open-settings="router.push('/settings')"
-        @open-mappools="router.push('/mappools')"
-        @refresh="refreshLobbyState"
-      />
+        <QuickActionBar
+          v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
+          :key="activeRoom.id"
+          :room="activeRoom"
+          @open-select-map="isOpenSelectMap = true"
+          @send-message="sendMessage"
+        />
+      </div>
 
-      <QuickActionBar
-        v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
-        :key="activeRoom.id"
-        :room="activeRoom"
-        @open-select-map="isOpenSelectMap = true"
-        @send-message="sendMessage"
-      />
+      <Transition
+        enter-active-class="transition duration-400 ease-out"
+        enter-from-class="-translate-y-full opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="-translate-y-full opacity-0"
+      >
+        <PickPrediction
+          v-if="pickPrediction"
+          class="absolute w-full z-0 backdrop-blur-xl"
+          :style="{ top: `${headerWrapperHeight}px` }"
+          :prediction="pickPrediction"
+          @pick="handlePredictionPick"
+          @ban="handlePredictionBan"
+          @dismiss="dismissPrediction"
+        />
+      </Transition>
 
       <div
         v-if="!activeRoom"
@@ -70,6 +83,17 @@
       <MessageInput
         :disabled="!globalState.isConnected || !activeRoom"
         @send-message="sendMessage"
+      />
+
+      <SelectMap
+        v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
+        :key="activeRoom.id"
+        :is-open="isOpenSelectMap"
+        :lobby-state="activeRoom.lobbyState"
+        :room-id="activeRoom.id"
+        @close="isOpenSelectMap = false"
+        @set-mappool="activeRoom.lobbyState.currentMappoolId = $event"
+        @select-beatmap="selectMap"
       />
     </div>
 
@@ -115,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { invoke } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
@@ -123,6 +147,7 @@ import RoomsDrawer from '@/components/Drawer/Rooms/Rooms.vue'
 import PlayersDrawer from '@/components/Drawer/Players/Players.vue'
 import ChatHeader from '@/components/chat/ChatHeader.vue'
 import QuickActionBar from '@/components/chat/QuickActionBar.vue'
+import PickPrediction from '@/components/chat/PickPrediction.vue'
 import ChatMessages from '@/components/chat/ChatMessages.vue'
 import MessageInput from '@/components/chat/MessageInput.vue'
 import CreateLobbyModal from '@/components/modals/CreateLobbyModal.vue'
@@ -134,11 +159,20 @@ import SelectMap from '@/components/Drawer/SelectMap.vue'
 import InvitePlayerModal from '@/components/modals/InvitePlayerModal.vue'
 import Icon from '@/components/UI/Icon.vue'
 import { useIrcRooms } from '@/composables/useIrcRooms'
+import { usePickPrediction } from '@/composables/usePickPrediction'
+import { banMap } from '@/stores/mapBans'
 import type { CreateLobbySettings, BeatmapEntry, UserJoinEvent } from '@/types'
+import { useElementSize } from '@vueuse/core'
 
 const router = useRouter()
 
+const headerWrapperRef = useTemplateRef('headerWrapper')
+
+const { height: headerWrapperHeight } = useElementSize(headerWrapperRef)
+
 const { roomsMap, activeRoom, roomsList, selectRoom, loadMoreMessages } = useIrcRooms()
+
+const { prediction: pickPrediction, dismiss: dismissPrediction } = usePickPrediction(activeRoom)
 
 const hasUnreadInOtherRooms = computed(() =>
   roomsList.value.some(room => room.id !== activeRoom.value?.id && room.hasUnread),
@@ -253,6 +287,18 @@ const selectMap = async (beatmap: BeatmapEntry) => {
     console.error('Failed to set mods:', error)
     alert('Failed to set mods. Make sure you are connected and try again.')
   }
+}
+
+const handlePredictionPick = () => {
+  if (!pickPrediction.value) return
+  selectMap(pickPrediction.value.beatmap)
+  dismissPrediction()
+}
+
+const handlePredictionBan = () => {
+  if (!pickPrediction.value || !activeRoom.value) return
+  banMap(activeRoom.value.id, pickPrediction.value.beatmap.id)
+  dismissPrediction()
 }
 
 const joinChannel = async (channelName: string) => {
