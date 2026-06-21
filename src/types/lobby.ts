@@ -57,4 +57,5 @@ export type CreateLobbySettings = {
   name: string
   teamMode: '0' | '1' | '2' | '3'
   scoreMode: '0' | '1' | '2' | '3'
+  mappoolId: number | null
 }

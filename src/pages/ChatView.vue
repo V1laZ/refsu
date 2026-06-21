@@ -38,6 +38,7 @@
       </div>
 
       <Transition
+        v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
         enter-active-class="transition duration-400 ease-out"
         enter-from-class="-translate-y-full opacity-0"
         enter-to-class="translate-y-0 opacity-100"
@@ -205,6 +206,14 @@ onMounted(async () => {
           roomId: joinEvent.channel,
           message: `!mp set ${settingsForNewLobby.value.teamMode} ${settingsForNewLobby.value.scoreMode} 16`,
         })
+
+        if (settingsForNewLobby.value.mappoolId !== null) {
+          await invoke('set_mappool', {
+            roomId: joinEvent.channel,
+            mappoolId: settingsForNewLobby.value.mappoolId,
+          })
+        }
+
         settingsForNewLobby.value = null
       }
       catch (error) {

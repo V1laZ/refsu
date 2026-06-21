@@ -55,6 +55,21 @@
           </option>
         </Select>
       </Field>
+
+      <Field label="Mappool">
+        <Select v-model="mappoolId">
+          <option :value="null">
+            None
+          </option>
+          <option
+            v-for="mappool in mappools"
+            :key="mappool.id"
+            :value="mappool.id"
+          >
+            {{ mappool.name }}
+          </option>
+        </Select>
+      </Field>
     </form>
 
     <template #footer>
@@ -79,6 +94,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { CreateLobbySettings } from '@/types'
+import { useMappools } from '@/composables/useMappools'
 import Modal from '@/components/UI/Modal.vue'
 import Btn from '@/components/UI/Btn.vue'
 import Input from '@/components/UI/Input.vue'
@@ -91,10 +107,13 @@ const emit = defineEmits<{
   createLobby: [settings: CreateLobbySettings]
 }>()
 
+const { mappools, loadMappools } = useMappools()
+
 const loading = ref(false)
 const lobbyName = ref('')
 const teamMode = ref<CreateLobbySettings['teamMode']>('2')
 const scoreMode = ref<CreateLobbySettings['scoreMode']>('3')
+const mappoolId = ref<CreateLobbySettings['mappoolId']>(null)
 const lobbyNameInputRef = useTemplateRef<{ focus: () => void }>('lobbyNameInputRef')
 
 const handleCreateLobby = () => {
@@ -116,11 +135,13 @@ const handleCreateLobby = () => {
     name: lobbyName.value,
     teamMode: teamMode.value,
     scoreMode: scoreMode.value,
+    mappoolId: mappoolId.value,
   })
 }
 
 watch(open, (newValue) => {
   if (newValue) {
+    loadMappools()
     nextTick(() => lobbyNameInputRef.value?.focus())
   }
 }, { immediate: true, flush: 'post' })
