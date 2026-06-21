@@ -51,6 +51,7 @@
           </Btn>
           <div class="relative">
             <IconBtn
+              ref="timerBtnEl"
               icon="timer"
               size="sm"
               :variant="timerIsActive ? 'danger' : 'ghost'"
@@ -196,9 +197,12 @@ const timerSeconds = ref(0)
 const timerTotalSeconds = computed(() => timerMinutes.value * 60 + timerSeconds.value)
 
 const timerPopupEl = useTemplateRef('timerPopupEl')
+const timerBtnEl = useTemplateRef('timerBtnEl')
 
 onClickOutside(timerPopupEl, () => {
   showTimerPopup.value = false
+}, {
+  ignore: [timerBtnEl],
 })
 
 async function handleTimerButtonClick() {
