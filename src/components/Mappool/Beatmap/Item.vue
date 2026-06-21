@@ -2,9 +2,11 @@
   <component
     :is="editable ? 'div' : 'button'"
     :type="editable ? undefined : 'button'"
-    class="group flex w-full items-stretch overflow-hidden rounded-lg border border-slate-800 bg-slate-800/40 text-left transition-colors hover:border-slate-700 hover:bg-slate-800/80"
-    :class="editable ? 'cursor-pointer' : ''"
-    @click="editable ? emit('edit') : emit('select', beatmap)"
+    class="group flex w-full items-stretch overflow-hidden rounded-lg border text-left transition-colors"
+    :class="banned
+      ? 'border-rose-900/60 bg-rose-950/20 cursor-not-allowed'
+      : ['border-slate-800 bg-slate-800/40 hover:border-slate-700 hover:bg-slate-800/80', editable ? 'cursor-pointer' : '']"
+    @click="handleClick"
   >
     <span
       v-if="editable"
@@ -19,8 +21,17 @@
       />
     </span>
 
-    <div class="min-w-0 flex-1 py-3 pl-2 pr-3">
+    <div
+      class="min-w-0 flex-1 py-3 pl-2 pr-3"
+      :class="banned ? 'opacity-60' : ''"
+    >
       <div class="mb-2 flex items-center gap-2">
+        <Badge
+          v-if="banned"
+          tone="danger"
+        >
+          Banned
+        </Badge>
         <Badge
           v-if="beatmap.category"
           :tone="categoryTone(beatmap.category)"
@@ -35,7 +46,10 @@
         </Badge>
       </div>
 
-      <h4 class="font-semibold leading-tight text-slate-100 transition-colors group-hover:text-pink-200">
+      <h4
+        class="font-semibold leading-tight text-slate-100 transition-colors"
+        :class="banned ? 'line-through' : 'group-hover:text-pink-200'"
+      >
         {{ beatmap.artist }} - {{ beatmap.title }}
       </h4>
       <p class="mt-0.5 text-sm text-slate-300">
@@ -45,6 +59,19 @@
       <p class="mt-1 font-mono text-xs text-slate-500">
         ID: {{ beatmap.beatmap_id }}
       </p>
+    </div>
+
+    <div
+      v-if="bannable"
+      class="flex shrink-0 items-center pr-3"
+    >
+      <IconBtn
+        icon="ban"
+        :variant="banned ? 'accent' : 'danger'"
+        size="sm"
+        :title="banned ? 'Unban map' : 'Ban map'"
+        @click.stop="emit('toggleBan', beatmap)"
+      />
     </div>
 
     <div
@@ -70,17 +97,26 @@ import IconBtn from '@/components/UI/IconBtn.vue'
 import { useCategoryTone } from '@/composables/useCategoryTone'
 import type { BeatmapEntry } from '@/types'
 
-const { beatmap, canRemove = true, editable = false } = defineProps<{
+const { beatmap, canRemove = true, editable = false, bannable = false, banned = false } = defineProps<{
   beatmap: BeatmapEntry
   canRemove?: boolean
   editable?: boolean
+  bannable?: boolean
+  banned?: boolean
 }>()
 
 const emit = defineEmits<{
   remove: []
   select: [beatmap: BeatmapEntry]
   edit: []
+  toggleBan: [beatmap: BeatmapEntry]
 }>()
 
 const { categoryTone } = useCategoryTone()
+
+const handleClick = () => {
+  if (editable) return emit('edit')
+  if (banned) return
+  emit('select', beatmap)
+}
 </script>

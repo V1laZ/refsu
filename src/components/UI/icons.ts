@@ -29,6 +29,7 @@ export const ICONS = {
   edit: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />' },
   drag: { viewBox: '0 0 24 24', fill: 'currentColor', stroke: 'none', strokeWidth: 0, body: '<circle cx="9" cy="5" r="1.6" /><circle cx="15" cy="5" r="1.6" /><circle cx="9" cy="12" r="1.6" /><circle cx="15" cy="12" r="1.6" /><circle cx="9" cy="19" r="1.6" /><circle cx="15" cy="19" r="1.6" />' },
   bell: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />' },
+  ban: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<circle cx="12" cy="12" r="9" /><path d="M5.64 5.64l12.72 12.72" />' },
 } as const
 
 export type IconName = keyof typeof ICONS

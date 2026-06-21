@@ -73,18 +73,31 @@
           <span class="truncate text-xs text-slate-500">
             {{ currentMappoolName }}
           </span>
-          <button
-            type="button"
-            class="shrink-0 text-xs text-slate-500 underline-offset-2 transition-colors hover:text-slate-300 hover:underline"
-            @click="startChangingMappool"
-          >
-            Change mappool
-          </button>
+          <div class="flex shrink-0 items-center gap-3">
+            <button
+              v-if="bannedIds.length"
+              type="button"
+              class="text-xs text-rose-400 underline-offset-2 transition-colors hover:text-rose-300 hover:underline"
+              @click="clearBans"
+            >
+              Clear bans
+            </button>
+            <button
+              type="button"
+              class="text-xs text-slate-500 underline-offset-2 transition-colors hover:text-slate-300 hover:underline"
+              @click="startChangingMappool"
+            >
+              Change mappool
+            </button>
+          </div>
         </div>
         <List
           :beatmaps="beatmaps"
           :can-remove="false"
-          @select="emit('selectBeatmap', $event)"
+          bannable
+          :banned-ids="bannedIds"
+          @select="selectBeatmap"
+          @toggle-ban="toggleBan"
         />
       </template>
     </div>
@@ -93,6 +106,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
+import { useSessionStorage } from '@vueuse/core'
 import { invoke } from '@tauri-apps/api/core'
 import List from '@/components/Mappool/Beatmap/List.vue'
 import { dbService } from '@/services/database'
@@ -118,6 +132,7 @@ const mappools = ref<Mappool[]>([])
 const selectedMappoolId = ref<number | null>(null)
 const beatmaps = ref<BeatmapEntry[]>([])
 const isChangingMappool = ref(false)
+const bannedIds = useSessionStorage<number[]>(`bans:${props.roomId}`, [])
 
 const currentMappoolName = computed(() => {
   const current = mappools.value.find(pool => pool.id === props.lobbyState.currentMappoolId)
@@ -152,6 +167,21 @@ const fetchBeatmaps = async (mappoolId: number) => {
     beatmaps.value = []
     console.error('Failed to fetch beatmaps:', error)
   }
+}
+
+const toggleBan = (beatmap: BeatmapEntry) => {
+  bannedIds.value = bannedIds.value.includes(beatmap.id)
+    ? bannedIds.value.filter(id => id !== beatmap.id)
+    : [...bannedIds.value, beatmap.id]
+}
+
+const clearBans = () => {
+  bannedIds.value = []
+}
+
+const selectBeatmap = (beatmap: BeatmapEntry) => {
+  if (bannedIds.value.includes(beatmap.id)) return
+  emit('selectBeatmap', beatmap)
 }
 
 const setActiveMappool = async () => {

@@ -29,9 +29,12 @@
         :beatmap="beatmap"
         :can-remove="canRemove"
         :editable="editable"
+        :bannable="bannable"
+        :banned="bannedIds.includes(beatmap.id)"
         @remove="removeBeatmap(beatmap.id)"
         @edit="emit('edit', beatmap)"
         @select="emit('select', beatmap)"
+        @toggle-ban="emit('toggleBan', beatmap)"
       />
     </div>
   </div>
@@ -46,10 +49,12 @@ import { dbService } from '@/services/database'
 import { confirm } from '@/composables/useConfirm'
 import type { BeatmapEntry } from '@/types'
 
-const { beatmaps = [], canRemove = true, editable = false } = defineProps<{
+const { beatmaps = [], canRemove = true, editable = false, bannable = false, bannedIds = [] } = defineProps<{
   beatmaps?: BeatmapEntry[]
   canRemove?: boolean
   editable?: boolean
+  bannable?: boolean
+  bannedIds?: number[]
 }>()
 
 const emit = defineEmits<{
@@ -57,6 +62,7 @@ const emit = defineEmits<{
   select: [beatmap: BeatmapEntry]
   edit: [beatmap: BeatmapEntry]
   reordered: [beatmaps: BeatmapEntry[]]
+  toggleBan: [beatmap: BeatmapEntry]
 }>()
 
 const localBeatmaps = ref<BeatmapEntry[]>([])

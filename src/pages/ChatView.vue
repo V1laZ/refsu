@@ -16,6 +16,7 @@
     <div class="relative grow flex flex-col min-w-0">
       <SelectMap
         v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
+        :key="activeRoom.id"
         :is-open="isOpenSelectMap"
         :lobby-state="activeRoom.lobbyState"
         :room-id="activeRoom.id"
