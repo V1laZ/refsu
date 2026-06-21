@@ -4,6 +4,7 @@ import { dbService } from '@/services/database'
 import { pickPredictionSettings } from '@/stores/settings'
 import { isBanned } from '@/stores/mapBans'
 import type { ActiveRoomMessageEvent, BeatmapEntry, IrcMessage, RoomUnion } from '@/types'
+import { globalState } from '@/stores/global'
 
 export type PickPrediction = {
   beatmap: BeatmapEntry
@@ -87,7 +88,7 @@ export function usePickPrediction(activeRoom: Ref<RoomUnion | null>) {
     const message: IrcMessage = event.message
     const sender = message.username.toLowerCase()
     if (sender === 'banchobot') return
-    // if (globalState.user && sender === globalState.user.toLowerCase()) return
+    if (globalState.user && sender === globalState.user.toLowerCase()) return
 
     const tokens = buildTokens(message.message)
     if (!tokens.size) return
