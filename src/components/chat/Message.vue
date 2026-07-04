@@ -120,6 +120,13 @@
           </template>
         </template>
       </div>
+
+      <span
+        v-if="isContinuation"
+        class="shrink-0 self-center text-xs tabular-nums text-slate-500 opacity-0 group-hover:opacity-100"
+      >
+        {{ formattedTime }}
+      </span>
     </div>
   </div>
 </template>
@@ -168,6 +175,7 @@ const formattedTime = computed(() => {
   return new Date(props.message.timestamp * 1000).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
   })
 })
 
