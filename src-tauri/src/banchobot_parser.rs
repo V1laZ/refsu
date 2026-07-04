@@ -12,6 +12,13 @@ macro_rules! static_regex {
     }};
 }
 
+fn usernames_match(a: &str, b: &str) -> bool {
+    fn normalize(username: &str) -> String {
+        username.trim().replace(' ', "_").to_lowercase()
+    }
+    normalize(a) == normalize(b)
+}
+
 pub struct BanchoBotParser;
 
 impl BanchoBotParser {
@@ -408,7 +415,7 @@ impl BanchoBotParser {
                 if let Some(lobby) = &mut room.lobby_state {
                     for slot in &mut lobby.slots {
                         if let Some(ref mut player) = slot.player {
-                            if player.username == username {
+                            if usernames_match(&player.username, username) {
                                 player.team = Some(team.clone());
                                 player.is_ready = false;
                             }
@@ -473,7 +480,7 @@ impl BanchoBotParser {
         let is_ready = !slot_text.contains("Not Ready") && !slot_text.contains("No Map");
 
         if let Some(captures) =
-            static_regex!(r"https?://osu\.ppy\.sh/u/\d+\s+([^\s\[]+)").captures(slot_text)
+            static_regex!(r"https?://osu\.ppy\.sh/u/\d+\s+(.+?)\s*(?:\[|$)").captures(slot_text)
         {
             let username = captures.get(1).unwrap().as_str().trim();
             if !username.is_empty() {
@@ -580,7 +587,7 @@ impl BanchoBotParser {
             if let Some(lobby) = &mut room.lobby_state {
                 for slot in &mut lobby.slots {
                     if let Some(ref player) = slot.player {
-                        if player.username == username {
+                        if usernames_match(&player.username, username) {
                             slot.player = None;
                             break;
                         }
@@ -688,7 +695,7 @@ impl BanchoBotParser {
 
                 for slot in &mut lobby.slots {
                     if let Some(ref mut player) = slot.player {
-                        player.is_host = player.username == host_username;
+                        player.is_host = usernames_match(&player.username, host_username);
                     }
                 }
 
@@ -712,7 +719,7 @@ impl BanchoBotParser {
                 let mut player_data = None;
                 for slot in &mut lobby.slots {
                     if let Some(ref player) = slot.player {
-                        if player.username == username {
+                        if usernames_match(&player.username, username) {
                             player_data = slot.player.take();
                             break;
                         }

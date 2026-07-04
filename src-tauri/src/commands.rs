@@ -499,6 +499,7 @@ pub async fn fetch_beatmap_data(
 
 #[tauri::command]
 pub async fn fetch_user_data(username: String, access_token: String) -> Result<UserData, String> {
+    let username = username.trim().replace(' ', "_");
     let client = reqwest::Client::new();
     let response = client
         .get(&format!("https://osu.ppy.sh/api/v2/users/@{}", username))

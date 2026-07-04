@@ -103,13 +103,13 @@
       v-if="activeRoom && activeRoom.roomType === 'MultiplayerLobby'"
       v-model:open="rightDrawerOpen"
       :lobby-state="activeRoom.lobbyState"
-      @move="sendMessage(`!mp move ${$event.playerName} ${$event.to}`)"
-      @team-change="sendMessage(`!mp team ${$event.playerName} ${$event.team}`)"
+      @move="sendMessage(`!mp move ${toIrcUsername($event.playerName)} ${$event.to}`)"
+      @team-change="sendMessage(`!mp team ${toIrcUsername($event.playerName)} ${$event.team}`)"
       @host="($event) => {
         if ($event === null) {
           sendMessage('!mp clearhost')
         } else {
-          sendMessage(`!mp host ${$event}`)
+          sendMessage(`!mp host ${toIrcUsername($event)}`)
         }
       }"
       @open-invite-player="invitePlayerOpen = true"
@@ -123,7 +123,7 @@
 
     <InvitePlayerModal
       v-model="invitePlayerOpen"
-      @invite="sendMessage(`!mp invite ${$event}`)"
+      @invite="sendMessage(`!mp invite ${toIrcUsername($event)}`)"
     />
 
     <PlayerModal
@@ -165,6 +165,7 @@ import { usePickPrediction } from '@/composables/usePickPrediction'
 import { banMap } from '@/stores/mapBans'
 import type { CreateLobbySettings, BeatmapEntry, UserJoinEvent } from '@/types'
 import { useElementSize } from '@vueuse/core'
+import { toIrcUsername } from '@/utils/username'
 
 const router = useRouter()
 
