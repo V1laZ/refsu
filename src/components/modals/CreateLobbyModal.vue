@@ -11,13 +11,14 @@
     >
       <Field
         label="Lobby name"
+        :hint="`${lobbyName.length}/${MAX_LOBBY_NAME_LENGTH}`"
         required
       >
         <Input
           ref="lobbyNameInputRef"
           v-model="lobbyName"
           placeholder="Enter lobby name"
-          :maxlength="50"
+          :maxlength="MAX_LOBBY_NAME_LENGTH"
           autofocus
         />
       </Field>
@@ -95,6 +96,7 @@
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { CreateLobbySettings } from '@/types'
 import { useMappools } from '@/composables/useMappools'
+import { MAX_LOBBY_NAME_LENGTH } from '@/utils/lobby'
 import Modal from '@/components/UI/Modal.vue'
 import Btn from '@/components/UI/Btn.vue'
 import Input from '@/components/UI/Input.vue'
@@ -124,15 +126,10 @@ const handleCreateLobby = () => {
     return
   }
 
-  if (name.length > 50) {
-    alert('Lobby name is too long (max 50 characters)')
-    return
-  }
-
   loading.value = true
 
   emit('createLobby', {
-    name: lobbyName.value,
+    name,
     teamMode: teamMode.value,
     scoreMode: scoreMode.value,
     mappoolId: mappoolId.value,

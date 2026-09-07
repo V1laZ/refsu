@@ -9,11 +9,14 @@
       class="space-y-4"
       @submit.prevent="handleSave"
     >
-      <Field label="Game name">
+      <Field
+        label="Game name"
+        :hint="`${gameName.length}/${MAX_LOBBY_NAME_LENGTH}`"
+      >
         <Input
           v-model="gameName"
           placeholder="Enter game name"
-          :maxlength="50"
+          :maxlength="MAX_LOBBY_NAME_LENGTH"
         />
       </Field>
 
@@ -122,6 +125,7 @@ import Btn from '@/components/UI/Btn.vue'
 import Input from '@/components/UI/Input.vue'
 import Select from '@/components/UI/Select.vue'
 import Field from '@/components/UI/Field.vue'
+import { MAX_LOBBY_NAME_LENGTH } from '@/utils/lobby'
 import type { MultiplayerRoom, LobbySettings } from '@/types'
 
 const open = defineModel<boolean>({ required: true })
