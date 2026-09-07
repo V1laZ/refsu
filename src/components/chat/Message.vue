@@ -4,6 +4,7 @@
     :class="{
       'mt-2': !isContinuation,
     }"
+    @click="handleRowClick"
   >
     <div class="flex items-start gap-3">
       <template v-if="!appearanceSettings.compactMode">
@@ -123,7 +124,8 @@
 
       <span
         v-if="isContinuation"
-        class="shrink-0 self-center text-xs tabular-nums text-slate-500 opacity-0 group-hover:opacity-100"
+        class="shrink-0 self-center text-xs tabular-nums text-slate-500 transition-opacity"
+        :class="timeVisible ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
       >
         {{ formattedTime }}
       </span>
@@ -138,6 +140,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { globalState } from '@/stores/global'
 import { parseNowPlaying, type NowPlaying } from '@/utils/nowPlaying'
 import { appearanceSettings } from '@/stores/settings'
+import { isAndroid } from '@/utils/platform'
 import Avatar from '@/components/UI/Avatar.vue'
 import Icon from '@/components/UI/Icon.vue'
 import Mod from '@/components/Mod.vue'
@@ -170,6 +173,21 @@ const usernameClass = computed(() => {
   if (props.message.username === 'BanchoBot') return base
   return `${base} ${hover} hover:underline cursor-pointer`
 })
+
+// Clustered messages only show their timestamp on hover, which Tailwind's
+// `hover:` variant restricts to devices that actually have a pointer — so on
+// Android there was no way to read it at all. Tapping the message reveals it
+// there; on desktop hover already covers it and a click should do nothing.
+const timeVisible = ref(false)
+
+const handleRowClick = (event: MouseEvent) => {
+  if (!isAndroid() || !props.isContinuation) return
+  // Leave links, avatars and the now-playing card to their own handlers, and
+  // don't fire on the tap that ends a long-press text selection.
+  if ((event.target as HTMLElement | null)?.closest('a, button')) return
+  if (window.getSelection()?.toString()) return
+  timeVisible.value = !timeVisible.value
+}
 
 const formattedTime = computed(() => {
   return new Date(props.message.timestamp * 1000).toLocaleTimeString([], {
