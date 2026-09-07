@@ -18,6 +18,9 @@
     "core:window:allow-close",
     "core:window:allow-is-maximized",
     "notification:default",
+    "dialog:default",
+    "fs:default",
+    "fs:allow-write-text-file",
     {
       "identifier": "http:default",
       "allow": [

@@ -28,6 +28,16 @@
 
     <div class="flex items-center gap-1">
       <IconBtn
+        v-if="activeChannel"
+        :icon="justSaved ? 'check' : 'save'"
+        size="sm"
+        :variant="justSaved ? 'accent' : 'ghost'"
+        :disabled="saving"
+        title="Save chat log"
+        @click="handleSaveChatLog"
+      />
+
+      <IconBtn
         icon="musicCollection"
         size="sm"
         title="Mappools"
@@ -56,6 +66,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import IconBtn from '@/components/UI/IconBtn.vue'
+import { useChatLog } from '@/composables/useChatLog'
 import type { RoomUnion } from '@/types'
 
 const props = defineProps<{
@@ -70,6 +81,12 @@ const emit = defineEmits<{
   openMappools: []
   refresh: []
 }>()
+
+const { saving, justSaved, saveChatLog } = useChatLog()
+
+const handleSaveChatLog = () => {
+  if (props.activeChannel) saveChatLog(props.activeChannel)
+}
 
 const isMpLobby = computed(() => {
   return props.activeChannel && props.activeChannel.roomType === 'MultiplayerLobby'

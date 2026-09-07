@@ -17,6 +17,7 @@ export const ICONS = {
   arrowDown: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M19 14l-7 7m0 0l-7-7m7 7V3" />' },
   trash: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' },
   download: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />' },
+  save: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M4 6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /><path d="M9 4v4h6V4" /><path d="M8 20v-5h8v5" />' },
   check: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M5 13l4 4L19 7" />' },
   alert: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' },
   question: { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, body: '<path d="M12 9v3m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />' },
