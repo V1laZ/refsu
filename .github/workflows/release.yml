@@ -38,15 +38,26 @@ jobs:
           fi
           echo "All versions match: $PKG"
 
+          # tauri-action publishes to v__VERSION__, i.e. v$PKG. A tag that says
+          # anything else would quietly publish to the wrong release.
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAG=${GITHUB_REF_NAME#v}
+            if [ "$TAG" != "$PKG" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME does not match version $PKG. tauri-action publishes to v$PKG, so bump the version to $TAG or retag as v$PKG."
+              exit 1
+            fi
+            echo "Tag $GITHUB_REF_NAME matches version $PKG"
+          fi
+
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
+        # No `version` input on purpose: the version comes from the
+        # `packageManager` field in package.json, so CI and local agree.
+        uses: pnpm/action-setup@v4
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -85,7 +96,9 @@ jobs:
           passphrase: ${{ secrets.APPIMAGE_KEY_PASSPHRASE }}
 
       - name: install frontend dependencies
-        run: pnpm install
+        # --frozen-lockfile so the build uses exactly the committed versions and
+        # fails loudly on drift, rather than silently re-resolving the ranges.
+        run: pnpm install --frozen-lockfile
 
       - uses: tauri-apps/tauri-action@dev
         id: tauri-action

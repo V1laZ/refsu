@@ -24,13 +24,13 @@ importers:
         specifier: ~2.5.9
         version: 2.5.9
       '@tauri-apps/plugin-notification':
-        specifier: ^2.3.3
+        specifier: 2.3.3
         version: 2.3.3
       '@tauri-apps/plugin-opener':
         specifier: 2.5.4
         version: 2.5.4
       '@tauri-apps/plugin-os':
-        specifier: ^2.3.2
+        specifier: 2.3.2
         version: 2.3.2
       '@tauri-apps/plugin-process':
         specifier: ~2.3.1
@@ -39,7 +39,7 @@ importers:
         specifier: ~2.4.0
         version: 2.4.0
       '@tauri-apps/plugin-updater':
-        specifier: ^2.10.1
+        specifier: 2.10.1
         version: 2.10.1
       '@vueuse/core':
         specifier: ^14.3.0
@@ -1754,7 +1754,7 @@ snapshots:
 
   '@tauri-apps/plugin-os@2.3.2':
     dependencies:
-      '@tauri-apps/api': 2.9.1
+      '@tauri-apps/api': 2.11.0
 
   '@tauri-apps/plugin-process@2.3.1':
     dependencies:
