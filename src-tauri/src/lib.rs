@@ -62,6 +62,8 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(IrcState::default())
         .invoke_handler(tauri::generate_handler![
             connect_to_bancho,
@@ -85,6 +87,7 @@ pub fn run() {
             set_lobby_command_defaults,
             get_room_state,
             get_room_messages_page,
+            get_room_log,
             check_for_updates,
             install_update,
         ])

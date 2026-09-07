@@ -359,6 +359,22 @@ pub async fn get_room_messages_page(
     }
 }
 
+/// Returns every message the room has buffered, oldest first, for exporting a
+/// chat log. Unlike `get_room_messages_page` this is not paginated, since the
+/// export needs the whole session.
+#[tauri::command]
+pub async fn get_room_log(
+    room_id: String,
+    state: State<'_, IrcState>,
+) -> Result<Vec<IrcMessage>, String> {
+    let irc_state = state.lock().unwrap();
+    irc_state
+        .rooms
+        .get(&room_id)
+        .map(|room| room.messages.clone())
+        .ok_or_else(|| "Room not found".to_string())
+}
+
 #[tauri::command]
 pub async fn start_private_message(
     username: String,
