@@ -72,17 +72,9 @@
                 ref="timerPopupEl"
                 class="absolute right-0 top-full z-50 mt-2 w-60 rounded-lg border border-slate-800 bg-slate-900 p-3 shadow-xl"
               >
-                <div class="mb-3 flex items-baseline justify-between gap-2">
-                  <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    Countdown timer
-                  </p>
-                  <span
-                    v-if="timerIsActive"
-                    class="font-mono text-xs text-pink-300"
-                  >
-                    {{ formattedTimerTime }}
-                  </span>
-                </div>
+                <p class="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+                  Countdown timer
+                </p>
                 <div class="mb-3 flex items-end gap-2">
                   <Field label="Minutes">
                     <Input
