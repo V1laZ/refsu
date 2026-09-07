@@ -9,10 +9,7 @@
       class="space-y-4"
       @submit.prevent="handleSave"
     >
-      <Field
-        label="Game name"
-        :hint="`${gameName.length}/${MAX_LOBBY_NAME_LENGTH}`"
-      >
+      <Field label="Game name">
         <Input
           v-model="gameName"
           placeholder="Enter game name"

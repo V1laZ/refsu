@@ -11,7 +11,6 @@
     >
       <Field
         label="Lobby name"
-        :hint="`${lobbyName.length}/${MAX_LOBBY_NAME_LENGTH}`"
         required
       >
         <Input
