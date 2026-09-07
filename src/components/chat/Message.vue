@@ -174,10 +174,6 @@ const usernameClass = computed(() => {
   return `${base} ${hover} hover:underline cursor-pointer`
 })
 
-// Clustered messages only show their timestamp on hover, which Tailwind's
-// `hover:` variant restricts to devices that actually have a pointer — so on
-// Android there was no way to read it at all. Tapping the message reveals it
-// there; on desktop hover already covers it and a click should do nothing.
 const timeVisible = ref(false)
 
 const handleRowClick = (event: MouseEvent) => {
