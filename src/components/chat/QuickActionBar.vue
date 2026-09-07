@@ -54,8 +54,8 @@
               ref="timerBtnEl"
               icon="timer"
               size="sm"
-              :variant="timerIsActive ? 'danger' : 'ghost'"
-              :title="timerIsActive ? 'Abort countdown' : 'Start countdown timer'"
+              :variant="timerIsActive ? 'accent' : 'ghost'"
+              :title="timerIsActive ? 'Countdown running' : 'Start countdown timer'"
               @click="handleTimerButtonClick"
             />
 
@@ -90,14 +90,24 @@
                     />
                   </Field>
                 </div>
-                <Btn
-                  block
-                  size="sm"
-                  :disabled="timerTotalSeconds <= 0"
-                  @click="startTimer"
-                >
-                  Start timer
-                </Btn>
+                <div class="flex gap-2">
+                  <Btn
+                    block
+                    size="sm"
+                    :disabled="timerTotalSeconds <= 0"
+                    @click="startTimer"
+                  >
+                    {{ timerIsActive ? 'Restart timer' : 'Start timer' }}
+                  </Btn>
+                  <Btn
+                    v-if="timerIsActive"
+                    variant="danger"
+                    size="sm"
+                    @click="abortTimer"
+                  >
+                    Abort
+                  </Btn>
+                </div>
               </div>
             </Transition>
           </div>
@@ -205,17 +215,7 @@ onClickOutside(timerPopupEl, () => {
   ignore: [timerBtnEl],
 })
 
-async function handleTimerButtonClick() {
-  if (timerIsActive.value) {
-    const ok = await confirm({
-      title: 'Abort countdown?',
-      message: 'The lobby countdown will be cancelled.',
-      confirmText: 'Abort',
-      tone: 'danger',
-    })
-    if (ok) emit('sendMessage', '!mp aborttimer')
-    return
-  }
+function handleTimerButtonClick() {
   if (!showTimerPopup.value) {
     const defaultSeconds = lobbyState.value.defaultTimerSeconds
     timerMinutes.value = Math.floor(defaultSeconds / 60)
@@ -224,9 +224,15 @@ async function handleTimerButtonClick() {
   showTimerPopup.value = !showTimerPopup.value
 }
 
+// `!mp timer` replaces a running countdown, so restarting needs no abort first.
 function startTimer() {
   if (timerTotalSeconds.value <= 0) return
   emit('sendMessage', `!mp timer ${timerTotalSeconds.value}`)
+  showTimerPopup.value = false
+}
+
+function abortTimer() {
+  emit('sendMessage', '!mp aborttimer')
   showTimerPopup.value = false
 }
 

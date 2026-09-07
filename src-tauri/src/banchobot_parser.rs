@@ -440,22 +440,13 @@ impl BanchoBotParser {
             return true;
         }
 
-        // Countdown with only seconds
-        if let Some(captures) = static_regex!(r"^Countdown ends in (\d+) seconds$").captures(text) {
-            if let Ok(duration) = captures.get(1).unwrap().as_str().parse::<u32>() {
+        // Countdown announcement. BanchoBot phrases this several ways depending on
+        // what is left: "30 seconds", "1 minute", "2 minutes", "1 minute and 30
+        // seconds", "1 second", so the duration is parsed rather than pattern-matched
+        // per shape.
+        if let Some(captures) = static_regex!(r"^Countdown ends in (.+)$").captures(text) {
+            if let Some(duration) = Self::parse_duration(captures.get(1).unwrap().as_str()) {
                 Self::update_timer(channel, Some(duration), state, app_handle);
-                return true;
-            }
-        }
-
-        // Countdown with minutes and seconds
-        if let Some(captures) =
-            static_regex!(r"^Countdown ends in (\d+) minutes? and (\d+) seconds$").captures(text)
-        {
-            let mins = captures.get(1).unwrap().as_str().parse::<u32>();
-            let secs = captures.get(2).unwrap().as_str().parse::<u32>();
-            if let (Ok(m), Ok(s)) = (mins, secs) {
-                Self::update_timer(channel, Some(m * 60 + s), state, app_handle);
                 return true;
             }
         }
@@ -778,6 +769,31 @@ impl BanchoBotParser {
         }
     }
 
+    /// Parses a BanchoBot duration phrase ("2 minutes", "1 minute and 30 seconds",
+    /// "45 seconds") into a total number of seconds. Returns `None` when the text
+    /// holds no recognisable amount.
+    fn parse_duration(text: &str) -> Option<u32> {
+        let mut total: u32 = 0;
+        let mut matched = false;
+
+        for captures in static_regex!(r"(\d+) (minute|second)s?\b").captures_iter(text) {
+            let value: u32 = captures.get(1).unwrap().as_str().parse().ok()?;
+            let seconds = if captures.get(2).unwrap().as_str() == "minute" {
+                value.checked_mul(60)?
+            } else {
+                value
+            };
+            total = total.checked_add(seconds)?;
+            matched = true;
+        }
+
+        if matched {
+            Some(total)
+        } else {
+            None
+        }
+    }
+
     /// Sets or clears the lobby countdown timer.
     /// Pass `Some(duration_secs)` to start, `None` to clear.
     fn update_timer(
@@ -808,5 +824,45 @@ impl BanchoBotParser {
                 Self::emit_lobby_update(channel, lobby, active_room_id.as_deref(), app_handle);
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BanchoBotParser;
+
+    #[test]
+    fn parses_seconds_only() {
+        assert_eq!(BanchoBotParser::parse_duration("30 seconds"), Some(30));
+        assert_eq!(BanchoBotParser::parse_duration("1 second"), Some(1));
+    }
+
+    #[test]
+    fn parses_minutes_only() {
+        assert_eq!(BanchoBotParser::parse_duration("1 minute"), Some(60));
+        assert_eq!(BanchoBotParser::parse_duration("2 minutes"), Some(120));
+        assert_eq!(BanchoBotParser::parse_duration("10 minutes"), Some(600));
+    }
+
+    #[test]
+    fn parses_minutes_and_seconds() {
+        assert_eq!(
+            BanchoBotParser::parse_duration("1 minute and 30 seconds"),
+            Some(90)
+        );
+        assert_eq!(
+            BanchoBotParser::parse_duration("2 minutes and 5 seconds"),
+            Some(125)
+        );
+        assert_eq!(
+            BanchoBotParser::parse_duration("1 minute and 1 second"),
+            Some(61)
+        );
+    }
+
+    #[test]
+    fn rejects_text_without_a_duration() {
+        assert_eq!(BanchoBotParser::parse_duration(""), None);
+        assert_eq!(BanchoBotParser::parse_duration("a moment"), None);
     }
 }
