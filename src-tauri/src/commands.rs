@@ -6,7 +6,7 @@ use irc::client::prelude::*;
 use std::sync::Arc;
 use tauri::{Emitter, State};
 
-fn emit_rooms_list_updated(app_handle: &tauri::AppHandle, state: &IrcState) {
+pub fn emit_rooms_list_updated(app_handle: &tauri::AppHandle, state: &IrcState) {
     let rooms_response = {
         let irc_state = state.lock().unwrap();
         RoomsListResponse {

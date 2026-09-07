@@ -1,4 +1,5 @@
 use crate::banchobot_parser::BanchoBotParser;
+use crate::commands::emit_rooms_list_updated;
 use crate::types::*;
 use futures::stream::StreamExt;
 use irc::client::prelude::*;
@@ -240,25 +241,40 @@ fn handle_incoming_message(
                     false
                 };
 
-                let (has_unread, mention_count, is_active) = {
+                let (has_unread, mention_count, is_active, room_created) = {
                     let mut irc_state = state.lock().unwrap();
 
                     // Create room if it doesn't exist (for incoming PMs)
-                    if is_private && !irc_state.rooms.contains_key(&room_id) {
+                    let room_created = if is_private && !irc_state.rooms.contains_key(&room_id) {
                         let new_room = Room::new_private_message(room_id.clone());
                         irc_state.rooms.insert(room_id.clone(), new_room);
-                    }
+                        true
+                    } else {
+                        false
+                    };
 
                     let is_active = irc_state.active_room_id.as_ref() == Some(&room_id);
 
                     // Add message to appropriate room
                     if let Some(room_obj) = irc_state.rooms.get_mut(&room_id) {
                         room_obj.add_message(irc_message.clone(), is_active, is_mention);
-                        (room_obj.has_unread, room_obj.mention_count, is_active)
+                        (
+                            room_obj.has_unread,
+                            room_obj.mention_count,
+                            is_active,
+                            room_created,
+                        )
                     } else {
-                        (false, 0, false)
+                        (false, 0, false, room_created)
                     }
                 };
+
+                // A PM from someone we have no room for yet has to show up in the room
+                // list straight away, otherwise it stays hidden until the next time the
+                // list happens to be re-emitted (joining a channel, opening another PM).
+                if room_created {
+                    emit_rooms_list_updated(app_handle, state);
+                }
 
                 if room_id.starts_with("#mp_") {
                     BanchoBotParser::parse_irc_message(&irc_message, state, app_handle);
@@ -321,15 +337,7 @@ fn handle_incoming_message(
                 };
 
                 if should_emit_list {
-                    // Emit rooms list update
-                    let rooms_response = {
-                        let irc_state = state.lock().unwrap();
-                        RoomsListResponse {
-                            rooms: irc_state.rooms.values().map(RoomListItem::from).collect(),
-                            active_room_id: irc_state.active_room_id.clone(),
-                        }
-                    };
-                    let _ = app_handle.emit("rooms-list-updated", rooms_response);
+                    emit_rooms_list_updated(app_handle, state);
                 }
 
                 println!("{} joined {}", nick, channel);
@@ -373,15 +381,7 @@ fn handle_incoming_message(
                 };
 
                 if should_emit_list {
-                    // Emit rooms list update
-                    let rooms_response = {
-                        let irc_state = state.lock().unwrap();
-                        RoomsListResponse {
-                            rooms: irc_state.rooms.values().map(RoomListItem::from).collect(),
-                            active_room_id: irc_state.active_room_id.clone(),
-                        }
-                    };
-                    let _ = app_handle.emit("rooms-list-updated", rooms_response);
+                    emit_rooms_list_updated(app_handle, state);
                 }
 
                 println!("{} left {}", nick, channel);
