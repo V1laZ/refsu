@@ -29,7 +29,7 @@
     <div class="flex items-center gap-1">
       <IconBtn
         v-if="activeChannel"
-        :icon="justSaved ? 'check' : 'download'"
+        :icon="justSaved ? 'check' : 'save'"
         size="sm"
         :variant="justSaved ? 'accent' : 'ghost'"
         :disabled="saving"

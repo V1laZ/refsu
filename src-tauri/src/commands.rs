@@ -359,9 +359,6 @@ pub async fn get_room_messages_page(
     }
 }
 
-/// Returns every message the room has buffered, oldest first, for exporting a
-/// chat log. Unlike `get_room_messages_page` this is not paginated, since the
-/// export needs the whole session.
 #[tauri::command]
 pub async fn get_room_log(
     room_id: String,
